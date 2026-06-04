@@ -38,12 +38,66 @@
   --r:8px; --r-lg:14px; --r-xl:20px; --r-pill:999px;
 }
 
+/* ─── DARK MODE VARIABLES ─── */
+body.dark{
+  --ink:    #edf0f5;
+  --ink-2:  #d4d9e4;
+  --ink-3:  #b8c0d0;
+  --mid:    #8a94a6;
+  --soft:   #6b7690;
+  --muted:  #4a5268;
+  --ghost:  #252c3d;
+  --pale:   #1a2030;
+  --paper:  #111724;
+  --white:  #161d2e;
+
+  --red:    #f87171;
+  --red-2:  #ef4444;
+  --red-bg: #1f1215;
+  --red-br: #4a1e1e;
+
+  --amber:  #fbbf24;
+  --amb-2:  #f59e0b;
+  --amb-bg: #1c1608;
+  --amb-br: #4a3500;
+
+  --teal:   #34d399;
+  --teal-2: #10b981;
+  --tea-bg: #051a14;
+  --tea-br: #0d3d2a;
+}
+
+body.dark body::before{
+  background:
+    radial-gradient(ellipse 800px 500px at 20% 0%, rgba(16,185,129,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 90% 100%, rgba(239,68,68,.05) 0%, transparent 70%);
+}
+
+body.dark .topbar{background:rgba(17,23,36,.9)}
+body.dark .kpi-tile:nth-child(1) .kpi-icon{background:var(--pale)!important}
+
+/* Dark mode toggle button */
+.theme-btn{
+  width:34px;height:34px;border-radius:10px;
+  border:1px solid var(--ghost);background:var(--white);
+  color:var(--mid);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.theme-btn:hover{background:var(--pale);color:var(--ink);border-color:var(--muted)}
+.theme-btn svg{width:15px;height:15px;transition:opacity .2s}
+.theme-btn .icon-moon{display:block}
+.theme-btn .icon-sun{display:none}
+body.dark .theme-btn .icon-moon{display:none}
+body.dark .theme-btn .icon-sun{display:block}
+
 body{
   font-family:'DM Sans',system-ui,sans-serif;
   background:var(--paper);
   color:var(--ink);
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
+  transition:background .25s,color .25s;
 }
 
 /* ─── CANVAS BG ─── */
@@ -589,6 +643,10 @@ body::before{
       <div class="live-dot" id="live-dot"></div>
       <span id="live-txt">EN VIVO</span>
     </div>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Modo oscuro">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
     <button class="add-btn" onclick="openModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
       <span class="lbl">Nuevo producto</span>
@@ -934,6 +992,15 @@ function showToast(msg){
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
 }
+/* ── dark mode ── */
+(function(){
+  if(localStorage.getItem('rodmar-theme')==='dark')document.body.classList.add('dark');
+})();
+function toggleTheme(){
+  const dark=document.body.classList.toggle('dark');
+  localStorage.setItem('rodmar-theme',dark?'dark':'light');
+}
+
 document.getElementById('q').addEventListener('input',e=>{qry=e.target.value;render();});
 document.querySelectorAll('.chip').forEach(c=>{
   c.addEventListener('click',()=>{
