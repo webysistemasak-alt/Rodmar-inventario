@@ -104,15 +104,17 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .filters { display:flex; gap:5px; flex-wrap:wrap; }
 .chip {
   font-size:12px; font-weight:500; padding:6px 13px;
-  border-radius:var(--r); border:1px solid var(--border);
+  border-radius:20px; border:1px solid var(--border);
   background:transparent; color:var(--text-3);
-  cursor:pointer; font-family:'Inter',sans-serif; transition:all .12s;
+  cursor:pointer; font-family:'Inter',sans-serif; transition:all .15s;
+  display:inline-flex; align-items:center; gap:5px;
 }
-.chip:hover { border-color:var(--text-3); color:var(--text-2); }
-.chip.on   { background:var(--navy);      color:#fff; border-color:var(--navy); }
-.chip.on-r { background:var(--red-soft);  color:var(--red);   border-color:#fca5a5; }
-.chip.on-a { background:var(--amber-soft);color:var(--amber); border-color:#fcd34d; }
-.chip.on-g { background:var(--green-soft);color:var(--green); border-color:#86efac; }
+.chip svg { flex-shrink:0; transition:stroke .15s; }
+.chip:hover { border-color:var(--text-2); color:var(--text-2); background:var(--bg); }
+.chip.on   { background:var(--navy);      color:#fff; border-color:var(--navy);  box-shadow:0 1px 4px rgba(11,31,58,.18); }
+.chip.on-r { background:var(--red-soft);  color:var(--red);   border-color:#fca5a5; box-shadow:0 1px 4px rgba(185,28,28,.1); }
+.chip.on-a { background:var(--amber-soft);color:var(--amber); border-color:#fcd34d; box-shadow:0 1px 4px rgba(146,64,14,.1); }
+.chip.on-g { background:var(--green-soft);color:var(--green); border-color:#86efac; box-shadow:0 1px 4px rgba(22,101,52,.1); }
 .add-btn {
   margin-left:auto; display:flex; align-items:center; gap:6px;
   padding:8px 16px; border-radius:var(--r);
@@ -368,10 +370,10 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
     <input type="text" id="q" placeholder="Buscar — ej: Catéter pig, MED-001...">
   </div>
   <div class="filters">
-    <button class="chip on" data-f="all">Todos</button>
-    <button class="chip"    data-f="sc">Crítico</button>
-    <button class="chip"    data-f="sl">Stock bajo</button>
-    <button class="chip"    data-f="so">Normal</button>
+    <button class="chip on" data-f="all"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Todos</button>
+    <button class="chip"    data-f="sc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Crítico</button>
+    <button class="chip"    data-f="sl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m10.29 3.86-8.28 14.28A2 2 0 0 0 3.74 21h16.52a2 2 0 0 0 1.73-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Stock bajo</button>
+    <button class="chip"    data-f="so"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Normal</button>
   </div>
   <button class="add-btn" onclick="openModal()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
