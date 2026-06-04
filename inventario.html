@@ -474,14 +474,101 @@ body::before{
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ─── RESPONSIVE ─── */
-@media(max-width:720px){
-  .topbar{padding:0 18px}
-  .hero{padding:18px 18px 0;flex-wrap:wrap}
-  .kpi-tile{flex:1 1 45%;min-width:140px}
-  .toolbar,.section-row{padding-left:18px;padding-right:18px}
-  .grid{padding-left:18px;padding-right:18px;padding-bottom:48px}
-  .add-btn .lbl{display:none}
+
+/* Tablet landscape / small desktop: 900–1200px */
+@media(max-width:1200px){
+  .topbar{padding:0 28px}
+  .hero{padding:24px 28px 0}
+  .toolbar,.section-row{padding-left:28px;padding-right:28px}
+  .grid{padding-left:28px;padding-right:28px}
+  .kpi-val{font-size:36px}
+}
+
+/* Tablet portrait: 600–900px */
+@media(max-width:900px){
+  .topbar{padding:0 20px;height:60px}
+  .hero{padding:20px 20px 0;flex-wrap:wrap;gap:10px}
+  .kpi-tile{flex:1 1 calc(50% - 5px);min-width:0}
+  .kpi-val{font-size:32px}
+  .toolbar,.section-row{padding-left:20px;padding-right:20px}
+  .grid{
+    padding-left:20px;padding-right:20px;padding-bottom:56px;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  }
   .brand-sub{display:none}
+  .date-lbl{display:none}
+  .modal{width:95%;max-width:440px}
+}
+
+/* Mobile: ≤600px */
+@media(max-width:600px){
+  .topbar{padding:0 14px;height:56px}
+  .brand-name{font-size:13.5px}
+  .brand-mark,.brand-mark-fb{width:34px;height:34px;font-size:15px}
+  .topbar-r{gap:6px}
+  .add-btn{padding:8px 13px;gap:5px;border-radius:12px}
+  .add-btn .lbl{display:none}
+  .live-pill{padding:5px 10px;font-size:10px}
+
+  .hero{padding:14px 14px 0;gap:8px}
+  .kpi-tile{flex:1 1 calc(50% - 4px);min-width:0;padding:16px 16px}
+  .kpi-eyebrow{font-size:9.5px;margin-bottom:6px}
+  .kpi-icon{width:18px;height:18px}
+  .kpi-val{font-size:28px;letter-spacing:-1.5px}
+  .kpi-desc{font-size:11px}
+
+  .toolbar{padding:12px 14px 10px;gap:6px;flex-direction:column;align-items:stretch}
+  .search-box{min-width:0;width:100%}
+  .filter-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+  .chip{padding:6px 4px;font-size:11px;text-align:center}
+
+  .section-row{padding:0 14px 12px}
+  .section-title{font-size:17px}
+
+  .grid{
+    padding:0 14px 72px;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  /* Cards */
+  .card-body{padding:16px 16px 0}
+  .card-name{font-size:14px;max-width:none}
+  .card-range{font-size:10.5px}
+  .card-mid{gap:10px;margin-bottom:14px}
+  .qbtn{width:36px;height:44px;font-size:20px}
+  .qnum{width:52px;height:44px;font-size:20px}
+  .bar-lbl{font-size:10px}
+  .card-foot{padding:9px 16px}
+
+  /* Modal — full screen on mobile */
+  .modal-bg{padding:0;align-items:flex-end}
+  .modal{
+    width:100%;max-width:100%;
+    border-radius:var(--r-xl) var(--r-xl) 0 0;
+    max-height:92vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .modal-head{padding:20px 20px 16px}
+  .modal-title{font-size:19px}
+  .modal-body{padding:18px 20px}
+  .modal-foot{padding:14px 20px;flex-direction:row}
+  .btn-ghost,.btn-primary{flex:1;text-align:center;padding:11px 10px;font-size:14px}
+  .field input{font-size:16px;padding:12px 13px} /* prevents iOS zoom */
+  .field-row{grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+  /* Toast */
+  .toast{font-size:12.5px;padding:10px 18px;bottom:20px;white-space:normal;text-align:center;max-width:88vw}
+}
+
+/* Very small phones: ≤380px */
+@media(max-width:380px){
+  .kpi-tile{flex:1 1 calc(50% - 4px)}
+  .kpi-val{font-size:24px}
+  .filter-group{grid-template-columns:repeat(2,1fr)}
+  .chip{padding:7px 6px}
+  .field-row{grid-template-columns:1fr 1fr 1fr}
 }
 </style>
 </head>
