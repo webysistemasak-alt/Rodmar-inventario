@@ -40,7 +40,9 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .brand-name { font-size:15px; font-weight:700; color:var(--blue-dark); letter-spacing:.3px; }
 .brand-sub  { font-size:11px; color:var(--text-soft); font-weight:400; margin-top:1px; }
 .live-chip  { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; background:var(--green-pale); border:1px solid #b2dfc8; font-size:11px; font-weight:600; color:var(--green); letter-spacing:.3px; }
+.live-chip.err { background:var(--red-pale); border-color:#f5b8b4; color:var(--red); }
 .pulse { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2s ease-in-out infinite; }
+.pulse.err { background:var(--red); animation:none; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
 /* KPIs */
@@ -75,6 +77,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 /* SYNC */
 .sync { padding:6px 32px; font-size:11px; color:var(--text-soft); background:var(--bg); border-bottom:1px solid var(--border-soft); display:flex; align-items:center; gap:6px; }
 .sync-dot { width:5px; height:5px; border-radius:50%; background:var(--green); }
+.sync-dot.err { background:var(--red); }
 
 /* GRID */
 .main { padding:24px 32px 48px; }
@@ -127,6 +130,15 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 @keyframes spin { to{ transform:rotate(360deg); } }
 .loading p { font-size:13px; font-weight:500; }
 
+/* ERROR BANNER */
+.err-banner { grid-column:1/-1; background:var(--red-pale); border:1px solid #f5b8b4; border-radius:var(--radius-lg); padding:28px 32px; text-align:center; }
+.err-banner-icon { font-size:36px; margin-bottom:12px; }
+.err-banner-title { font-size:16px; font-weight:700; color:var(--red); margin-bottom:8px; }
+.err-banner-msg { font-size:13px; color:var(--text-mid); line-height:1.6; margin-bottom:16px; }
+.err-banner-detail { font-size:11px; font-family:monospace; background:#fff; border:1px solid #f5b8b4; border-radius:6px; padding:10px 14px; color:var(--text-mid); word-break:break-all; margin-bottom:16px; text-align:left; max-width:600px; margin-left:auto; margin-right:auto; }
+.err-banner-retry { padding:9px 20px; background:var(--red); color:#fff; border:none; border-radius:var(--radius); font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:opacity .15s; }
+.err-banner-retry:hover { opacity:.85; }
+
 /* MODAL */
 .modal-bg { position:fixed; inset:0; background:rgba(10,22,40,.55); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; z-index:200; padding:20px; }
 .modal { background:var(--white); border-radius:var(--radius-lg); border:1px solid var(--border); padding:28px; width:400px; max-width:100%; box-shadow:var(--shadow); }
@@ -175,7 +187,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
       <div class="brand-sub">Sistema de gestión de inventario</div>
     </div>
   </div>
-  <div class="live-chip"><div class="pulse"></div>EN VIVO</div>
+  <div class="live-chip" id="live-chip"><div class="pulse" id="live-pulse"></div><span id="live-txt">EN VIVO</span></div>
 </header>
 
 <section class="kpi-band">
@@ -219,7 +231,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 </div>
 
 <div class="sync">
-  <div class="sync-dot"></div>
+  <div class="sync-dot" id="sync-dot"></div>
   <span id="sync-lbl">Conectando con la base de datos...</span>
 </div>
 
@@ -261,25 +273,99 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 <div class="toast" id="toast"></div>
 
 <script>
-const sb = supabase.createClient(
-  'https://mdikqwgqhtiefhmiootr.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kaWtxd2dxaHRpZWZobWlvb3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTA5MjgsImV4cCI6MjA5NjA4NjkyOH0.wfmiCjArEZnusIPRqkg3I07q_MkkyzzxCFQIj8szuUY'
-);
+// ─── DETECTAR SI SE ESTÁ ABRIENDO COMO ARCHIVO LOCAL ───────────────────────
+if (location.protocol === 'file:') {
+  document.getElementById('grid').innerHTML = `
+    <div class="err-banner">
+      <div class="err-banner-icon">⚠️</div>
+      <div class="err-banner-title">No se puede ejecutar como archivo local</div>
+      <div class="err-banner-msg">
+        Este sistema necesita estar alojado en un servidor web para poder conectarse a la base de datos.<br>
+        <strong>Abre esta página desde GitHub Pages</strong>, no haciéndole doble clic al archivo.
+      </div>
+      <div class="err-banner-detail">
+        Tu URL actual comienza con <strong>file://</strong> — eso bloquea todas las conexiones externas.<br>
+        URL correcta: <strong>https://webysistemasak-alt.github.io/Rodmar-inventario/</strong>
+      </div>
+    </div>`;
+  document.getElementById('sync-lbl').textContent = 'Sin conexión — abre desde GitHub Pages';
+  document.getElementById('sync-dot').classList.add('err');
+  document.getElementById('live-chip').classList.add('err');
+  document.getElementById('live-pulse').classList.add('err');
+  document.getElementById('live-txt').textContent = 'SIN CONEXIÓN';
+  // Detener aquí, no intentar conectar
+  throw new Error('file:// protocol detected');
+}
+
+// ─── SUPABASE CLIENT ────────────────────────────────────────────────────────
+let sb;
+try {
+  sb = supabase.createClient(
+    'https://mdikqwgqhtiefhmiootr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kaWtxd2dxaHRpZWZobWlvb3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTA5MjgsImV4cCI6MjA5NjA4NjkyOH0.wfmiCjArEZnusIPRqkg3I07q_MkkyzzxCFQIj8szuUY'
+  );
+} catch(e) {
+  showError('No se pudo inicializar Supabase. Recarga la página.', e.message);
+}
 
 let items = [], fil = 'all', qry = '';
 
+function showError(msg, detail) {
+  document.getElementById('grid').innerHTML = `
+    <div class="err-banner">
+      <div class="err-banner-icon">🔌</div>
+      <div class="err-banner-title">Error de conexión</div>
+      <div class="err-banner-msg">${msg}</div>
+      ${detail ? `<div class="err-banner-detail">${detail}</div>` : ''}
+      <button class="err-banner-retry" onclick="location.reload()">🔄 Reintentar</button>
+    </div>`;
+  document.getElementById('sync-lbl').textContent = 'Error de conexión con la base de datos';
+  document.getElementById('sync-dot').classList.add('err');
+  document.getElementById('live-chip').classList.add('err');
+  document.getElementById('live-pulse').classList.add('err');
+  document.getElementById('live-txt').textContent = 'DESCONECTADO';
+}
+
 async function load() {
-  const { data } = await sb.from('productos').select('*').order('created_at', { ascending: true });
-  if (data) items = data;
-  render(); setSyncLabel();
-  sb.channel('rodmar_ch')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'productos' }, () => loadSilent())
-    .subscribe();
+  try {
+    const { data, error } = await sb.from('productos').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    items = data || [];
+    render();
+    setSyncLabel();
+    // Suscripción realtime
+    sb.channel('rodmar_ch')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'productos' }, () => loadSilent())
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          document.getElementById('live-txt').textContent = 'EN VIVO';
+          document.getElementById('live-chip').classList.remove('err');
+          document.getElementById('live-pulse').classList.remove('err');
+        }
+      });
+  } catch(e) {
+    let hint = e.message || String(e);
+    // Dar un hint más claro según el tipo de error
+    if (hint.includes('Failed to fetch') || hint.includes('NetworkError')) {
+      hint = 'No hay conexión a Internet o el servidor de Supabase está bloqueado.<br><em>' + hint + '</em>';
+    } else if (hint.includes('JWT') || hint.includes('anon')) {
+      hint = 'La clave de API es inválida o expiró.<br><em>' + hint + '</em>';
+    } else if (hint.includes('relation') || hint.includes('does not exist')) {
+      hint = 'La tabla "productos" no existe en Supabase. Verifica tu base de datos.<br><em>' + hint + '</em>';
+    }
+    showError('No se pudieron cargar los productos.', hint);
+  }
 }
 
 async function loadSilent() {
-  const { data } = await sb.from('productos').select('*').order('created_at', { ascending: true });
-  if (data) { items = data; render(); setSyncLabel(); }
+  try {
+    const { data, error } = await sb.from('productos').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    if (data) { items = data; render(); setSyncLabel(); }
+  } catch(e) {
+    // Fallo silencioso en recargas en segundo plano
+    console.warn('loadSilent error:', e.message);
+  }
 }
 
 function setSyncLabel() {
@@ -362,13 +448,15 @@ function render() {
 async function chg(id, d) {
   const p = items.find(x => x.id===id); if (!p) return;
   const nq = Math.max(0, p.cantidad + d);
-  await sb.from('productos').update({ cantidad: nq }).eq('id', id);
+  const { error } = await sb.from('productos').update({ cantidad: nq }).eq('id', id);
+  if (error) { showToast('Error al actualizar: ' + error.message); return; }
   p.cantidad = nq; render();
 }
 
 async function del(id, nombre) {
   if (!confirm('¿Eliminar "' + nombre + '"?\nEsta acción no se puede deshacer.')) return;
-  await sb.from('productos').delete().eq('id', id);
+  const { error } = await sb.from('productos').delete().eq('id', id);
+  if (error) { showToast('Error al eliminar: ' + error.message); return; }
   items = items.filter(x => x.id!==id); render();
   showToast('Producto eliminado');
 }
@@ -394,7 +482,7 @@ async function saveProduct() {
   if (!maximo||maximo<=minimo) { document.getElementById('e3').style.display='block'; ok=false; }
   if (!ok) return;
   const { error } = await sb.from('productos').insert({ codigo, nombre, cantidad, minimo, maximo });
-  if (error) { alert('Error: ' + error.message); return; }
+  if (error) { alert('Error al guardar: ' + error.message); return; }
   closeModal();
   showToast('Producto guardado correctamente');
   loadSilent();
@@ -416,6 +504,7 @@ document.querySelectorAll('.chip').forEach(c => {
   });
 });
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
 load();
 </script>
 </body>
