@@ -919,11 +919,20 @@ function showErr(msg,detail){
   setErr('Error de conexión');
 }
 
+async function fetchAll(){
+  let all=[],from=0,STEP=1000;
+  while(true){
+    const{data,error}=await sb.from('productos').select('*').order('created_at',{ascending:true}).range(from,from+STEP-1);
+    if(error)throw error;
+    all=all.concat(data||[]);
+    if(!data||data.length<STEP)break;
+    from+=STEP;
+  }
+  return all;
+}
 async function load(){
   try{
-    const{data,error}=await sb.from('productos').select('*').order('created_at',{ascending:true});
-    if(error)throw error;
-    items=data||[];render();setSyncOk();
+    items=await fetchAll();render();setSyncOk();
     sb.channel('rodmar_live')
       .on('postgres_changes',{event:'*',schema:'public',table:'productos'},()=>loadSilent())
       .subscribe(s=>{
@@ -936,8 +945,8 @@ async function load(){
 }
 async function loadSilent(){
   try{
-    const{data,error}=await sb.from('productos').select('*').order('created_at',{ascending:true});
-    if(!error&&data){items=data;render();setSyncOk();}
+    const data=await fetchAll();
+    items=data;render();setSyncOk();
   }catch(e){console.warn(e);}
 }
 
