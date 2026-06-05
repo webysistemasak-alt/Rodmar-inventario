@@ -256,6 +256,9 @@ body::before{
 }
 .chip:hover{border-color:var(--muted);color:var(--ink-3)}
 .chip.on  {background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.on-cat{background:var(--ink-2);color:#fff;border-color:var(--ink-2)}
+.chip-cat{font-size:11px;padding:5px 11px}
+#cat-chips{margin-top:4px;width:100%}
 .chip.on-r{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
 .chip.on-a{background:var(--amb-bg);color:var(--amber);border-color:var(--amb-br)}
 .chip.on-g{background:var(--tea-bg);color:var(--teal);border-color:var(--tea-br)}
@@ -711,6 +714,16 @@ body::before{
     <button class="chip"     data-f="sl">Stock bajo</button>
     <button class="chip"     data-f="so">Normal</button>
   </div>
+  <div class="filter-group" id="cat-chips">
+    <button class="chip chip-cat on-cat" data-cat="all">Todas las áreas</button>
+    <button class="chip chip-cat" data-cat="CARDIO">Cardio</button>
+    <button class="chip chip-cat" data-cat="PERI">Peri</button>
+    <button class="chip chip-cat" data-cat="NEURO">Neuro</button>
+    <button class="chip chip-cat" data-cat="ONCO">Onco</button>
+    <button class="chip chip-cat" data-cat="CURA">Cura</button>
+    <button class="chip chip-cat" data-cat="G-GASTOS V">Gastos</button>
+    <button class="chip chip-cat" data-cat="G-TRAMITES">Trámites</button>
+  </div>
 </div>
 
 <!-- SECTION HEADER -->
@@ -748,6 +761,18 @@ body::before{
       </div>
       <div class="field-row">
         <div class="field"><label>Cantidad</label><input type="number" id="fq" placeholder="0" min="0"></div>
+        <div class="field"><label>Categoría</label>
+          <select id="fcat" style="width:100%;padding:10px 12px;border:1px solid var(--ghost);border-radius:var(--r-lg);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--white);outline:none;">
+            <option value="">Sin categoría</option>
+            <option value="CARDIO">CARDIO</option>
+            <option value="PERI">PERI</option>
+            <option value="NEURO">NEURO</option>
+            <option value="ONCO">ONCO</option>
+            <option value="CURA">CURA</option>
+            <option value="G-GASTOS V">G-GASTOS V</option>
+            <option value="G-TRAMITES">G-TRAMITES</option>
+          </select>
+        </div>
         <div class="field"><label>Mínimo</label><input type="number" id="fmi" placeholder="5" min="0"></div>
         <div class="field"><label>Máximo</label><input type="number" id="fma" placeholder="50" min="1"></div>
       </div>
@@ -758,11 +783,50 @@ body::before{
     <div class="modal-foot">
       <button class="btn-ghost"   onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="saveProduct()">Guardar producto</button>
+      <button class="btn-sec" style="margin-left:auto" onclick="openImport()">⬆ Importar catálogo</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-bg" id="import-modal" style="display:none" onclick="bgClickImport(event)">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Importar catálogo</div>
+        <div class="modal-sub">Pega el catálogo en formato CSV o usa el botón para cargar desde el Excel</div>
+      </div>
+      <button class="close-btn" onclick="closeImport()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Formato esperado por línea: <code style="font-family:monospace;font-size:11px;background:var(--pale);padding:2px 6px;border-radius:4px">CATEGORIA,CODIGO,NOMBRE</code></label>
+        <textarea id="import-txt" rows="10" placeholder="CARDIO,007042,GUIA TEFLONADA J .035 X 145&#10;PERI,ABC-001,CATETER 5FR&#10;..." style="width:100%;padding:10px 12px;border:1px solid var(--ghost);border-radius:var(--r-lg);font-size:12px;font-family:'DM Mono',monospace;color:var(--ink);background:var(--white);outline:none;resize:vertical;margin-top:6px;"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <label style="font-size:12px;color:var(--mid)">Cantidad inicial:</label>
+        <input type="number" id="import-qty" value="0" min="0" style="width:70px;padding:6px 10px;border:1px solid var(--ghost);border-radius:var(--r);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);outline:none">
+        <label style="font-size:12px;color:var(--mid)">Mínimo:</label>
+        <input type="number" id="import-min" value="0" min="0" style="width:70px;padding:6px 10px;border:1px solid var(--ghost);border-radius:var(--r);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);outline:none">
+        <label style="font-size:12px;color:var(--mid)">Máximo:</label>
+        <input type="number" id="import-max" value="10" min="1" style="width:70px;padding:6px 10px;border:1px solid var(--ghost);border-radius:var(--r);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);outline:none">
+      </div>
+      <div id="import-progress" style="display:none;margin-top:14px">
+        <div style="font-size:12px;color:var(--mid);margin-bottom:6px" id="import-status">Importando...</div>
+        <div style="height:6px;background:var(--ghost);border-radius:99px;overflow:hidden">
+          <div id="import-bar" style="height:100%;background:var(--teal-2);border-radius:99px;width:0%;transition:width .3s"></div>
+        </div>
+      </div>
+      <div id="import-err" style="display:none;margin-top:10px;font-size:12px;color:var(--red);background:var(--red-bg);border:1px solid var(--red-br);border-radius:var(--r);padding:10px 14px"></div>
+    </div>
+    <div class="modal-foot" style="gap:10px">
+      <button class="btn-sec" onclick="closeImport()">Cancelar</button>
+      <button class="btn-primary" onclick="runImport()" id="import-btn">Importar productos</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ── date label ── */
@@ -810,7 +874,7 @@ try{
   );
 }catch(e){showErr('No se pudo inicializar Supabase.',e.message);}
 
-let items=[],fil='all',qry='';
+let items=[],fil='all',qry='',catFil='all';
 
 function setErr(msg){
   document.getElementById('sync-lbl').textContent=msg;
@@ -886,6 +950,7 @@ function render(){
   const vis=items.filter(p=>{
     const s=status(p);
     return(fil==='all'||s===fil)&&
+      (catFil==='all'||(p.categoria||'')===(catFil))&&
       (p.nombre.toLowerCase().includes(qry.toLowerCase())||
       (p.codigo&&p.codigo.toLowerCase().includes(qry.toLowerCase())));
   });
@@ -906,7 +971,7 @@ function render(){
         <div class="card-body">
           <div class="card-top">
             <div>
-              <div class="card-code">${p.codigo||'SIN CÓDIGO'}</div>
+              <div class="card-code">${p.codigo||'SIN CÓDIGO'}${p.categoria?` <span style="font-size:10px;font-weight:600;background:var(--pale);color:var(--mid);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${p.categoria}</span>`:''}</div>
               <div class="card-name">${p.nombre}</div>
               <div class="card-range">Mín ${p.minimo} · Máx ${p.maximo} uds.</div>
             </div>
@@ -969,6 +1034,7 @@ function openModal(){document.getElementById('modal').style.display='flex';setTi
 function closeModal(){
   document.getElementById('modal').style.display='none';
   ['fc','fn','fq','fmi','fma'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('fcat').value='';
   ['e1','e2','e3'].forEach(i=>document.getElementById(i).style.display='none');
 }
 function bgClick(e){if(e.target===document.getElementById('modal'))closeModal();}
@@ -978,13 +1044,14 @@ async function saveProduct(){
   const cantidad=parseInt(document.getElementById('fq').value)||0;
   const minimo=parseInt(document.getElementById('fmi').value)||0;
   const maximo=parseInt(document.getElementById('fma').value)||0;
+  const categoria=document.getElementById('fcat').value||null;
   let ok=true;
   ['e1','e2','e3'].forEach(i=>document.getElementById(i).style.display='none');
   if(!codigo){document.getElementById('e1').style.display='block';ok=false;}
   if(!nombre){document.getElementById('e2').style.display='block';ok=false;}
   if(!maximo||maximo<=minimo){document.getElementById('e3').style.display='block';ok=false;}
   if(!ok)return;
-  const{error}=await sb.from('productos').insert({codigo,nombre,cantidad,minimo,maximo});
+  const{error}=await sb.from('productos').insert({codigo,nombre,cantidad,minimo,maximo,categoria});
   if(error){alert('Error al guardar: '+error.message);return;}
   closeModal();showToast('Producto guardado');loadSilent();
 }
@@ -1003,15 +1070,72 @@ function toggleTheme(){
 }
 
 document.getElementById('q').addEventListener('input',e=>{qry=e.target.value;render();});
-document.querySelectorAll('.chip').forEach(c=>{
+document.querySelectorAll('.chip:not(.chip-cat)').forEach(c=>{
   c.addEventListener('click',()=>{
     fil=c.dataset.f;
-    document.querySelectorAll('.chip').forEach(x=>x.className='chip');
+    document.querySelectorAll('.chip:not(.chip-cat)').forEach(x=>x.className='chip');
     c.className=fil==='sc'?'chip on-r':fil==='sl'?'chip on-a':fil==='so'?'chip on-g':'chip on';
     render();
   });
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.querySelectorAll('.chip-cat').forEach(c=>{
+  c.addEventListener('click',()=>{
+    catFil=c.dataset.cat;
+    document.querySelectorAll('.chip-cat').forEach(x=>x.className='chip chip-cat');
+    c.className='chip chip-cat on-cat';
+    render();
+  });
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeImport();}});
+
+/* ── IMPORT ── */
+function openImport(){document.getElementById('import-modal').style.display='flex';}
+function closeImport(){
+  document.getElementById('import-modal').style.display='none';
+  document.getElementById('import-txt').value='';
+  document.getElementById('import-progress').style.display='none';
+  document.getElementById('import-err').style.display='none';
+  document.getElementById('import-btn').disabled=false;
+  document.getElementById('import-btn').textContent='Importar productos';
+}
+function bgClickImport(e){if(e.target===document.getElementById('import-modal'))closeImport();}
+async function runImport(){
+  const raw=document.getElementById('import-txt').value.trim();
+  if(!raw){document.getElementById('import-err').style.display='block';document.getElementById('import-err').textContent='Pega el contenido CSV primero.';return;}
+  const qty=parseInt(document.getElementById('import-qty').value)||0;
+  const min=parseInt(document.getElementById('import-min').value)||0;
+  const max=parseInt(document.getElementById('import-max').value)||10;
+  if(max<=min){document.getElementById('import-err').style.display='block';document.getElementById('import-err').textContent='El máximo debe ser mayor que el mínimo.';return;}
+  document.getElementById('import-err').style.display='none';
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const rows=[];
+  for(const line of lines){
+    const parts=line.split(',');
+    if(parts.length<3)continue;
+    const categoria=parts[0].trim();
+    const codigo=parts[1].trim();
+    const nombre=parts.slice(2).join(',').trim();
+    if(!codigo||!nombre)continue;
+    rows.push({categoria,codigo,nombre,cantidad:qty,minimo:min,maximo:max});
+  }
+  if(!rows.length){document.getElementById('import-err').style.display='block';document.getElementById('import-err').textContent='No se encontraron filas válidas. Formato esperado: CATEGORIA,CODIGO,NOMBRE';return;}
+  document.getElementById('import-btn').disabled=true;
+  document.getElementById('import-btn').textContent='Importando...';
+  document.getElementById('import-progress').style.display='block';
+  const CHUNK=50;let done=0,errs=0;
+  for(let i=0;i<rows.length;i+=CHUNK){
+    const chunk=rows.slice(i,i+CHUNK);
+    const{error}=await sb.from('productos').insert(chunk);
+    if(error)errs+=chunk.length; else done+=chunk.length;
+    const pct=Math.round(((i+CHUNK)/rows.length)*100);
+    document.getElementById('import-bar').style.width=Math.min(pct,100)+'%';
+    document.getElementById('import-status').textContent=`Importando... ${Math.min(i+CHUNK,rows.length)} / ${rows.length} productos`;
+  }
+  document.getElementById('import-status').textContent=`✓ ${done} productos importados${errs?` (${errs} errores)`:''}`;
+  document.getElementById('import-btn').textContent='Listo';
+  loadSilent();
+  setTimeout(closeImport,2200);
+}
 load();
 </script>
 </body>
