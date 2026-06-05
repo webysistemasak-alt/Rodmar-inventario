@@ -1135,6 +1135,12 @@ async function runImport(){
     rows.push({categoria,codigo,nombre,cantidad:qty,minimo:min,maximo:max});
   }
   if(!rows.length){document.getElementById('import-err').style.display='block';document.getElementById('import-err').textContent='No se encontraron filas válidas. Formato esperado: CATEGORIA,CODIGO,NOMBRE';return;}
+  // Deduplicar por código — si hay duplicados en el CSV, queda el último
+  const seen=new Map();
+  rows.forEach(r=>seen.set(r.codigo,r));
+  const deduped=[...seen.values()];
+  const dupCount=rows.length-deduped.length;
+  rows.length=0;deduped.forEach(r=>rows.push(r));
   document.getElementById('import-btn').disabled=true;
   document.getElementById('import-btn').textContent='Importando...';
   document.getElementById('import-progress').style.display='block';
@@ -1163,7 +1169,7 @@ async function runImport(){
     document.getElementById('import-btn').textContent='Importar productos';
     return;
   }
-  document.getElementById('import-status').textContent=`✓ ${done} productos importados${errs?` (${errs} con error)`:''}`;
+  document.getElementById('import-status').textContent=`✓ ${done} productos importados${errs?` (${errs} con error)`:''}${dupCount?` · ${dupCount} duplicados ignorados`:''}`;
   document.getElementById('import-btn').textContent='Listo';
   loadSilent();
   setTimeout(closeImport,2200);
