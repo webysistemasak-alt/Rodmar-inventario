@@ -192,6 +192,22 @@ body.dark .brand-mark img{filter:brightness(1.05)}
   width:1px;height:18px;background:var(--ghost);flex-shrink:0;
 }
 .brand-sub{font-size:11px;color:var(--mid);margin-top:0;font-weight:500}
+
+/* Título minimalista junto al logo */
+.brand-title{
+  font-size:11px;font-weight:500;
+  color:var(--muted);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  flex-shrink:0;
+  line-height:1;
+}
+.brand-title-dot{
+  margin:0 6px;
+  opacity:.35;
+  font-weight:300;
+}
 .topbar-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .date-lbl{
   font-size:11px;color:var(--mid);font-weight:600;
@@ -751,6 +767,7 @@ body.dark .btn-primary{color:#080e1c}
   .brand-mark-fb{height:28px;font-size:18px}
   .brand-sep{display:none}
   .brand-sub{display:none!important}
+  .brand-title{font-size:9.5px;letter-spacing:.08em}
   /* Botones derechos: más apretados y sin overflow */
   .topbar-r{gap:4px;flex-shrink:0;min-width:0}
   .date-lbl{display:none}
@@ -1052,10 +1069,7 @@ body.guest .guest-banner{display:block}
 <header class="topbar">
   <div class="brand">
     <div id="brand-mark" class="brand-mark-fb">RODMAR</div>
-    <div class="brand-sep"></div>
-    <div class="brand-text">
-      <div class="brand-sub">Gestión de inventario</div>
-    </div>
+    <div class="brand-title">Inventario<span class="brand-title-dot">·</span>Rodmar</div>
   </div>
   <div class="topbar-r">
     <div class="date-lbl" id="date-lbl"></div>
