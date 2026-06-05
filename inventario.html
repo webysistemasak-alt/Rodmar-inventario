@@ -515,6 +515,22 @@ body::before{
   font-family:'DM Sans',sans-serif;transition:background .15s;
 }
 .btn-primary:hover{background:var(--ink-2)}
+.btn-sec{
+  padding:9px 18px;font-size:13px;font-weight:500;
+  border:1px solid var(--ghost);border-radius:var(--r-lg);
+  background:var(--white);color:var(--mid);cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .12s;
+}
+.btn-sec:hover{border-color:var(--ink-3);color:var(--ink);background:var(--pale)}
+/* alias para el botón × del modal de importar */
+.close-btn{
+  width:30px;height:30px;border-radius:8px;
+  border:1px solid var(--ghost);background:transparent;
+  color:var(--muted);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;transition:all .12s;flex-shrink:0;
+}
+.close-btn:hover{background:var(--pale);color:var(--ink)}
 
 /* ─── TOAST ─── */
 .toast{
@@ -1122,16 +1138,32 @@ async function runImport(){
   document.getElementById('import-btn').disabled=true;
   document.getElementById('import-btn').textContent='Importando...';
   document.getElementById('import-progress').style.display='block';
-  const CHUNK=50;let done=0,errs=0;
+  const CHUNK=50;let done=0,errs=0,firstErrMsg='';
   for(let i=0;i<rows.length;i+=CHUNK){
     const chunk=rows.slice(i,i+CHUNK);
     const{error}=await sb.from('productos').insert(chunk);
-    if(error)errs+=chunk.length; else done+=chunk.length;
+    if(error){
+      errs+=chunk.length;
+      if(!firstErrMsg)firstErrMsg=error.message||error.code||JSON.stringify(error);
+    } else done+=chunk.length;
     const pct=Math.round(((i+CHUNK)/rows.length)*100);
     document.getElementById('import-bar').style.width=Math.min(pct,100)+'%';
     document.getElementById('import-status').textContent=`Importando... ${Math.min(i+CHUNK,rows.length)} / ${rows.length} productos`;
   }
-  document.getElementById('import-status').textContent=`✓ ${done} productos importados${errs?` (${errs} errores)`:''}`;
+  if(errs&&!done){
+    // Todo falló — probablemente RLS sin política de INSERT
+    const isRls=firstErrMsg&&(firstErrMsg.includes('row-level')||firstErrMsg.includes('policy')||firstErrMsg.includes('violates')||firstErrMsg.includes('42501'));
+    const errEl=document.getElementById('import-err');
+    errEl.style.display='block';
+    errEl.innerHTML=isRls
+      ? `<strong>Error de permisos (RLS)</strong><br>Supabase está bloqueando los insertos. Ejecuta esto en el <em>SQL Editor</em> de tu proyecto:<br><br><code style="display:block;margin-top:8px;padding:8px 10px;background:var(--white);border-radius:6px;font-size:10.5px;word-break:break-all">CREATE POLICY "anon insert" ON productos FOR INSERT TO anon WITH CHECK (true);</code>`
+      : `<strong>Error al importar:</strong> ${firstErrMsg}`;
+    document.getElementById('import-status').textContent=`✗ 0 de ${rows.length} importados`;
+    document.getElementById('import-btn').disabled=false;
+    document.getElementById('import-btn').textContent='Importar productos';
+    return;
+  }
+  document.getElementById('import-status').textContent=`✓ ${done} productos importados${errs?` (${errs} con error)`:''}`;
   document.getElementById('import-btn').textContent='Listo';
   loadSilent();
   setTimeout(closeImport,2200);
