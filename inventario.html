@@ -1524,8 +1524,12 @@ function openPrivacidad(){document.getElementById('privacidad-modal').style.disp
 function closePrivacidad(){document.getElementById('privacidad-modal').style.display='none';}
 
 /* ══════════════════════════════════════════
-   AUTH — Login / Logout / Guest
+   AUTH — Login local (usuario fijo)
 ══════════════════════════════════════════ */
+const AUTH_USER = 'inventario@rodmar.mx';
+const AUTH_PASS = 'rodmar2010+';
+const SESSION_KEY = 'rodmar-session';
+
 function showLoginScreen(){
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('l-email').value='';
@@ -1553,34 +1557,32 @@ function clearUserUI(){
   document.body.classList.remove('guest');
 }
 
-async function doLogin(){
-  const email=document.getElementById('l-email').value.trim();
+function doLogin(){
+  const email=document.getElementById('l-email').value.trim().toLowerCase();
   const pass=document.getElementById('l-pass').value;
   const errEl=document.getElementById('login-err');
   const btn=document.getElementById('login-btn');
   errEl.style.display='none';
-  if(!email||!pass){errEl.textContent='Completa correo y contraseña.';errEl.style.display='block';return;}
+  if(!email||!pass){errEl.textContent='Completa usuario y contraseña.';errEl.style.display='block';return;}
   btn.disabled=true;btn.textContent='Verificando...';
-  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  btn.disabled=false;
-  btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Iniciar sesión`;
-  if(error){
-    const msg=error.message.includes('Invalid login')||error.message.includes('invalid_credentials')
-      ?'Correo o contraseña incorrectos.'
-      :error.message.includes('Email not confirmed')
-      ?'Confirma tu correo antes de iniciar sesión.'
-      :'Error: '+error.message;
-    errEl.textContent=msg;errEl.style.display='block';
-    return;
-  }
-  hideLoginScreen();
-  setUserUI(data.user.email);
-  load();
+  setTimeout(()=>{
+    if(email===AUTH_USER && pass===AUTH_PASS){
+      sessionStorage.setItem(SESSION_KEY, AUTH_USER);
+      hideLoginScreen();
+      setUserUI(AUTH_USER);
+      load();
+    } else {
+      errEl.textContent='Usuario o contraseña incorrectos.';
+      errEl.style.display='block';
+    }
+    btn.disabled=false;
+    btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Iniciar sesión`;
+  }, 400);
 }
 
-async function doLogout(){
+function doLogout(){
   if(!confirm('¿Cerrar sesión?'))return;
-  await sb.auth.signOut();
+  sessionStorage.removeItem(SESSION_KEY);
   clearUserUI();
   items=[];render();
   showLoginScreen();
@@ -1592,18 +1594,13 @@ async function doLogout(){
 });
 
 /* ── Arranque: detectar sesión activa ── */
-(async function initAuth(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){
+(function initAuth(){
+  const saved=sessionStorage.getItem(SESSION_KEY);
+  if(saved){
     hideLoginScreen();
-    setUserUI(session.user.email);
+    setUserUI(saved);
     load();
   }
-  // Escuchar cambios de sesión (expiración, etc.)
-  sb.auth.onAuthStateChange((event,session)=>{
-    if(event==='SIGNED_OUT'){clearUserUI();items=[];showLoginScreen();}
-    if(event==='TOKEN_REFRESHED'&&session) setUserUI(session.user.email);
-  });
 })();
 
 </script>
