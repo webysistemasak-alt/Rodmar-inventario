@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://mdikqwgqhtiefhmiootr.supabase.co wss://mdikqwgqhtiefhmiootr.supabase.co https://raw.githubusercontent.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://raw.githubusercontent.com data:;">
 <title>RODMAR — Inventario</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -958,6 +959,17 @@ async function loadSilent(){
   }catch(e){console.warn(e);}
 }
 
+/* ── SEGURIDAD: escape HTML para evitar XSS ── */
+function esc(str){
+  if(str==null)return'';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
 const _statusCache=new Map();
 function status(p){
   const cached=_statusCache.get(p.id);
@@ -1014,23 +1026,27 @@ function _cardHtml(p,animate){
   const s=status(p);
   const pct=Math.min(100,Math.round(p.cantidad/Math.max(p.maximo,1)*100));
   const fecha=new Date(p.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+  const eCodigo=esc(p.codigo||'SIN CÓDIGO');
+  const eCat=p.categoria?`<span style="font-size:10px;font-weight:600;background:var(--pale);color:var(--mid);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${esc(p.categoria)}</span>`:'';
+  const eNombre=esc(p.nombre);
+  const eId=esc(p.id);
   return`<div class="card${animate?' card-new':''}">
     <div class="card-inner-row">
       <div class="card-strip ${s}"></div>
       <div class="card-body">
         <div class="card-top">
           <div>
-            <div class="card-code">${p.codigo||'SIN CÓDIGO'}${p.categoria?` <span style="font-size:10px;font-weight:600;background:var(--pale);color:var(--mid);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${p.categoria}</span>`:''}</div>
-            <div class="card-name">${p.nombre}</div>
+            <div class="card-code">${eCodigo}${eCat}</div>
+            <div class="card-name">${eNombre}</div>
             <div class="card-range">Mín ${p.minimo} · Máx ${p.maximo} uds.</div>
           </div>
           ${badgeHtml(s)}
         </div>
         <div class="card-mid">
           <div class="qty-ctrl">
-            <button class="qbtn" onclick="chg('${p.id}',-1)">−</button>
+            <button class="qbtn" onclick="chg('${eId}',-1)">−</button>
             <div class="qnum">${p.cantidad}</div>
-            <button class="qbtn" onclick="chg('${p.id}',1)">+</button>
+            <button class="qbtn" onclick="chg('${eId}',1)">+</button>
           </div>
           <div class="bar-col">
             <div class="bar-top">
@@ -1051,7 +1067,7 @@ function _cardHtml(p,animate){
     </div>
     <div class="card-foot">
       <span class="card-date">Alta ${fecha}</span>
-      <button class="del-btn" onclick="del('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">
+      <button class="del-btn" onclick="del('${eId}','${esc(p.nombre)}')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3 6 5 6 21 6"/>
           <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -1122,11 +1138,11 @@ function closeModal(){
 }
 function bgClick(e){if(e.target===document.getElementById('modal'))closeModal();}
 async function saveProduct(){
-  const codigo=document.getElementById('fc').value.trim();
-  const nombre=document.getElementById('fn').value.trim();
-  const cantidad=parseInt(document.getElementById('fq').value)||0;
-  const minimo=parseInt(document.getElementById('fmi').value)||0;
-  const maximo=parseInt(document.getElementById('fma').value)||0;
+  const codigo=document.getElementById('fc').value.trim().slice(0,50);
+  const nombre=document.getElementById('fn').value.trim().slice(0,120);
+  const cantidad=Math.max(0,Math.min(99999,parseInt(document.getElementById('fq').value)||0));
+  const minimo=Math.max(0,Math.min(99999,parseInt(document.getElementById('fmi').value)||0));
+  const maximo=Math.max(0,Math.min(99999,parseInt(document.getElementById('fma').value)||0));
   const categoria=document.getElementById('fcat').value||null;
   let ok=true;
   ['e1','e2','e3'].forEach(i=>document.getElementById(i).style.display='none');
@@ -1190,19 +1206,25 @@ function bgClickImport(e){if(e.target===document.getElementById('import-modal'))
 async function runImport(){
   const raw=document.getElementById('import-txt').value.trim();
   if(!raw){document.getElementById('import-err').style.display='block';document.getElementById('import-err').textContent='Pega el contenido CSV primero.';return;}
-  const qty=parseInt(document.getElementById('import-qty').value)||0;
-  const min=parseInt(document.getElementById('import-min').value)||0;
-  const max=parseInt(document.getElementById('import-max').value)||10;
+  const qty=Math.max(0,Math.min(99999,parseInt(document.getElementById('import-qty').value)||0));
+  const min=Math.max(0,Math.min(99999,parseInt(document.getElementById('import-min').value)||0));
+  const max=Math.max(0,Math.min(99999,parseInt(document.getElementById('import-max').value)||10));
   if(max<=min){document.getElementById('import-err').style.display='block';document.getElementById('import-err').textContent='El máximo debe ser mayor que el mínimo.';return;}
   document.getElementById('import-err').style.display='none';
   const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  // Límite de seguridad: máx 5000 filas por importación
+  if(lines.length>5000){
+    document.getElementById('import-err').style.display='block';
+    document.getElementById('import-err').textContent='Límite excedido: máximo 5,000 filas por importación.';
+    return;
+  }
   const rows=[];
   for(const line of lines){
     const parts=line.split(',');
     if(parts.length<3)continue;
-    const categoria=parts[0].trim();
-    const codigo=parts[1].trim();
-    const nombre=parts.slice(2).join(',').trim();
+    const categoria=parts[0].trim().slice(0,50);
+    const codigo=parts[1].trim().slice(0,50);
+    const nombre=parts.slice(2).join(',').trim().slice(0,120);
     if(!codigo||!nombre)continue;
     rows.push({categoria,codigo,nombre,cantidad:qty,minimo:min,maximo:max});
   }
