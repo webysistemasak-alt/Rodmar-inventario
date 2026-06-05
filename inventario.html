@@ -1141,7 +1141,7 @@ async function runImport(){
   const CHUNK=50;let done=0,errs=0,firstErrMsg='';
   for(let i=0;i<rows.length;i+=CHUNK){
     const chunk=rows.slice(i,i+CHUNK);
-    const{error}=await sb.from('productos').insert(chunk);
+    const{error}=await sb.from('productos').upsert(chunk,{onConflict:'codigo',ignoreDuplicates:false});
     if(error){
       errs+=chunk.length;
       if(!firstErrMsg)firstErrMsg=error.message||error.code||JSON.stringify(error);
