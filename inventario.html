@@ -10,7 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* ── LIGHT MODE ── superficies cálidas con carácter, no todo blanco puro */
+  
   --ink:    #0c0f18;
   --ink-2:  #181e2e;
   --ink-3:  #232d44;
@@ -20,11 +20,11 @@
   --ghost:  #c8d2e4;
   --pale:   #e8edf6;
   --paper:  #f0f3f9;
-  --white:  #f8faff;        /* blanco ligeramente azulado — no tan puro */
+  --white:  #f8faff;       
   --card:   #ffffff;
   --shadow: rgba(12,15,24,.12);
 
-  /* STATUS — saturados y bien diferenciados en luz */
+  
   --red:    #b91c1c;
   --red-2:  #dc2626;
   --red-bg: #fff1f1;
@@ -43,19 +43,19 @@
   --tea-br: #34d399;
   --tea-glow: rgba(5,150,105,.12);
 
-  /* CÓDIGO — violeta intenso en luz */
+  
   --code-bg:   #f0edff;
   --code-text: #4c1d95;
   --code-br:   #a78bfa;
 
-  /* CATEGORÍA — slate oscuro siempre legible */
+  
   --cat-bg:    #1e293b;
   --cat-text:  #e2e8f0;
 
   --r:8px; --r-lg:12px; --r-xl:18px; --r-pill:999px;
 }
 
-/* ─── DARK MODE — rico, contrastado, vibrante ─── */
+
 body.dark{
   --ink:    #f0f4ff;
   --ink-2:  #dae2f4;
@@ -67,36 +67,36 @@ body.dark{
   --pale:   #0f1a30;
   --paper:  #080e1c;
   --white:  #0d1526;
-  --card:   #111d35;        /* cards azul marino oscuro — no negro puro */
+  
   --shadow: rgba(0,0,0,.6);
 
-  /* CRÍTICO — rojo neón brillante en oscuro */
+  
   --red:    #ff6b6b;
   --red-2:  #ff4444;
   --red-bg: #2d0a0a;
   --red-br: #7f1d1d;
   --red-glow: rgba(255,68,68,.20);
 
-  /* BAJO — ámbar neón */
+  
   --amber:  #ffd166;
   --amb-2:  #ffb703;
   --amb-bg: #2a1500;
   --amb-br: #7c3a00;
   --amb-glow: rgba(255,183,3,.18);
 
-  /* NORMAL — verde menta vibrante */
+  
   --teal:   #4ade80;
   --teal-2: #22c55e;
   --tea-bg: #052010;
   --tea-br: #14532d;
   --tea-glow: rgba(34,197,94,.18);
 
-  /* CÓDIGO — violeta/cian neon en oscuro */
+  
   --code-bg:   #1a0d3d;
   --code-text: #a78bfa;
   --code-br:   #5b21b6;
 
-  /* CATEGORÍA — más luminosa en oscuro */
+  
   --cat-bg:    #1e3a5f;
   --cat-text:  #93c5fd;
 }
@@ -113,7 +113,7 @@ body.dark .kpi-tile:nth-child(1) .kpi-icon{background:var(--pale)!important}
 body.dark .chip.on{background:#f0f4ff;color:#080e1c;border-color:#f0f4ff}
 body.dark .search-box input:focus{box-shadow:0 0 0 3px rgba(74,222,128,.12)}
 
-/* Dark mode toggle button */
+
 .theme-btn{
   width:32px;height:32px;border-radius:8px;
   border:1px solid var(--ghost);background:transparent;
@@ -137,7 +137,7 @@ body{
   transition:background .3s,color .3s;
 }
 
-/* ─── CANVAS BG — atmósfera más intensa ─── */
+
 body::before{
   content:'';
   position:fixed;inset:0;
@@ -168,7 +168,7 @@ body.dark::before{
 }
 .brand{display:flex;align-items:center;gap:11px}
 
-/* Logo sin contenedor cuadrado */
+
 .brand-mark{
   height:40px;
   overflow:hidden;flex-shrink:0;
@@ -784,7 +784,7 @@ body.dark .btn-primary{color:#080e1c}
   padding:0 0 32px;
   text-align:center;
 }
-/* Logo en login — sin contenedor cuadrado */
+
 .login-logo-wrap{
   display:flex;align-items:center;justify-content:center;
   margin:0 auto 20px;
