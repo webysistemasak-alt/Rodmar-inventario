@@ -188,6 +188,20 @@ body.dark .brand-mark img{filter:brightness(1.05)}
   font-size:14px;font-weight:700;color:var(--ink);
   letter-spacing:-.2px;line-height:1.2;
 }
+/* Título minimalista al lado del logo */
+.brand-title{
+  font-size:12px;font-weight:500;
+  color:var(--muted);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.brand-title-dot{
+  margin:0 5px;
+  opacity:.4;
+  font-weight:300;
+}
 .brand-sep{
   width:1px;height:18px;background:var(--ghost);flex-shrink:0;
 }
@@ -751,6 +765,7 @@ body.dark .btn-primary{color:#080e1c}
   .brand-mark-fb{height:28px;font-size:18px}
   .brand-sep{display:none}
   .brand-sub{display:none!important}
+  .brand-title{font-size:10px;letter-spacing:.06em}
   /* Botones derechos: más apretados y sin overflow */
   .topbar-r{gap:4px;flex-shrink:0;min-width:0}
   .date-lbl{display:none}
@@ -769,11 +784,11 @@ body.dark .btn-primary{color:#080e1c}
   #user-pill{padding:3px 7px;gap:0}
   #user-pill .u-dot{width:24px;height:24px;font-size:10px}
 
-  .hero{padding:14px 12px 0;gap:8px}
-  .kpi-tile{flex:1 1 calc(50% - 4px);min-width:0;padding:16px 14px 18px}
+  .hero{padding:16px 12px 0;gap:10px}
+  .kpi-tile{flex:1 1 calc(50% - 5px);min-width:0;padding:18px 14px 16px}
   .kpi-eyebrow{font-size:9px;margin-bottom:10px;gap:5px}
   .kpi-icon{width:16px;height:16px;border-radius:4px}
-  .kpi-val{font-size:52px;letter-spacing:-3px;margin-bottom:6px}
+  .kpi-val{font-size:42px;letter-spacing:-2px;margin-bottom:6px}
   .kpi-desc{font-size:10.5px;line-height:1.3}
 
   .toolbar{padding:12px 12px 10px;gap:6px;flex-direction:column;align-items:stretch}
@@ -1052,10 +1067,7 @@ body.guest .guest-banner{display:block}
 <header class="topbar">
   <div class="brand">
     <div id="brand-mark" class="brand-mark-fb">RODMAR</div>
-    <div class="brand-sep"></div>
-    <div class="brand-text">
-      <div class="brand-sub">Gestión de inventario</div>
-    </div>
+    <div class="brand-title">Inventario<span class="brand-title-dot">·</span>Rodmar</div>
   </div>
   <div class="topbar-r">
     <div class="date-lbl" id="date-lbl"></div>
