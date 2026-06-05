@@ -643,8 +643,119 @@ body::before{
   .toast{font-size:12.5px;padding:10px 18px;bottom:20px;white-space:normal;text-align:center;max-width:88vw}
 }
 
-/* Very small phones: ≤380px */
-@media(max-width:380px){
+/* ─── LOGIN SCREEN ─── */
+#login-screen{
+  position:fixed;inset:0;
+  background:var(--paper);
+  z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+#login-screen::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 800px 500px at 20% 0%, rgba(14,122,108,.055) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 90% 100%, rgba(197,26,26,.04) 0%, transparent 70%);
+  pointer-events:none;
+}
+.login-card{
+  background:var(--white);
+  border:1px solid var(--ghost);
+  border-radius:var(--r-xl);
+  box-shadow:0 24px 80px rgba(12,15,20,.12);
+  width:380px;max-width:100%;
+  overflow:hidden;
+  position:relative;z-index:1;
+}
+.login-head{
+  padding:32px 32px 24px;
+  border-bottom:1px solid var(--pale);
+  text-align:center;
+}
+.login-logo{
+  width:52px;height:52px;border-radius:14px;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:#fff;
+  margin:0 auto 16px;
+}
+.login-title{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:var(--ink);letter-spacing:-.3px;
+  margin-bottom:4px;
+}
+.login-sub{font-size:12.5px;color:var(--soft)}
+.login-body{padding:26px 32px}
+.login-field{margin-bottom:16px}
+.login-field label{
+  display:block;font-size:11px;font-weight:500;
+  color:var(--soft);margin-bottom:5px;
+  letter-spacing:.4px;text-transform:uppercase;
+}
+.login-field input{
+  width:100%;padding:11px 14px;
+  border:1px solid var(--ghost);border-radius:var(--r-lg);
+  font-size:14px;font-family:'DM Sans',sans-serif;
+  color:var(--ink);background:var(--paper);
+  outline:none;transition:border-color .15s,background .15s;
+}
+.login-field input:focus{border-color:var(--ink-3);background:var(--white)}
+.login-field input::placeholder{color:var(--muted)}
+.login-err{
+  font-size:12px;color:var(--red);
+  background:var(--red-bg);border:1px solid var(--red-br);
+  border-radius:var(--r);padding:10px 14px;
+  margin-bottom:14px;display:none;
+  line-height:1.5;
+}
+.login-btn{
+  width:100%;padding:12px;
+  background:var(--ink);color:#fff;
+  border:none;border-radius:var(--r-lg);
+  font-size:14px;font-weight:500;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:background .15s,opacity .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.login-btn:hover{background:var(--ink-2)}
+.login-btn:disabled{opacity:.55;cursor:not-allowed}
+.login-footer{
+  padding:16px 32px;background:var(--paper);
+  border-top:1px solid var(--pale);
+  font-size:11.5px;color:var(--soft);text-align:center;line-height:1.6;
+}
+/* usuario pill en topbar */
+#user-pill{
+  display:none;align-items:center;gap:7px;
+  padding:5px 12px 5px 8px;
+  border:1px solid var(--ghost);border-radius:var(--r-pill);
+  background:var(--white);font-size:12px;color:var(--mid);
+  cursor:pointer;transition:all .15s;
+}
+#user-pill:hover{border-color:var(--muted);color:var(--ink)}
+#user-pill .u-dot{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;flex-shrink:0;
+}
+/* ocultar controles de edición cuando no hay sesión */
+body.guest .add-btn,
+body.guest .del-btn,
+body.guest .qbtn,
+body.guest #import-trigger{display:none!important}
+body.guest .qty-ctrl{pointer-events:none;opacity:.5}
+.guest-banner{
+  display:none;
+  background:var(--amb-bg);border-bottom:1px solid var(--amb-br);
+  padding:9px 40px;font-size:12.5px;color:var(--amber);
+  text-align:center;position:relative;z-index:2;
+}
+body.guest .guest-banner{display:block}
+@media(max-width:600px){.guest-banner{padding:9px 14px}}
+
   .kpi-tile{flex:1 1 calc(50% - 4px)}
   .kpi-val{font-size:24px}
   .filter-group{grid-template-columns:repeat(2,1fr)}
@@ -654,6 +765,85 @@ body::before{
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-head">
+      <div class="login-logo" id="login-logo">R</div>
+      <div class="login-title">RODMAR Inventario</div>
+      <div class="login-sub">Accede con tu cuenta de personal autorizado</div>
+    </div>
+    <div class="login-body">
+      <div id="login-err" class="login-err"></div>
+      <div class="login-field">
+        <label>Correo electrónico</label>
+        <input type="email" id="l-email" placeholder="correo@rodmar.com" autocomplete="username">
+      </div>
+      <div class="login-field">
+        <label>Contraseña</label>
+        <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Iniciar sesión
+      </button>
+    </div>
+    <div class="login-footer">
+      ¿No tienes acceso? Contacta al administrador del sistema.<br>
+      <span style="color:var(--muted);font-size:11px">O continúa como visitante —
+        <a href="#" onclick="enterAsGuest();return false;" style="color:var(--mid);text-decoration:underline">solo lectura</a>
+      </span><br>
+      <span style="color:var(--muted);font-size:10.5px;margin-top:4px;display:inline-block">
+        Al iniciar sesión aceptas nuestro
+        <a href="#" onclick="openPrivacidad();return false;" style="color:var(--mid);text-decoration:underline">Aviso de Privacidad</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AVISO DE PRIVACIDAD -->
+<div id="privacidad-modal" style="display:none;position:fixed;inset:0;background:rgba(12,15,20,.6);backdrop-filter:blur(6px);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--white);border-radius:var(--r-xl);border:1px solid var(--ghost);width:540px;max-width:100%;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(12,15,20,.22)">
+    <div style="padding:22px 26px 18px;border-bottom:1px solid var(--pale);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)">Aviso de Privacidad</div>
+        <div style="font-size:11.5px;color:var(--soft);margin-top:3px">INTEGRACIÓN MÉDICA RODMAR S.A DE C.V — Sistema de Inventario</div>
+      </div>
+      <button onclick="closePrivacidad()" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--ghost);background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
+    </div>
+    <div style="padding:22px 26px;overflow-y:auto;font-size:13px;color:var(--ink);line-height:1.7">
+
+      <p style="margin-bottom:14px;color:var(--soft);font-size:12px">Vigente a partir de la fecha de acceso al sistema.</p>
+
+      <strong style="color:var(--teal);font-size:12px;letter-spacing:.5px;text-transform:uppercase">I. Responsable</strong>
+      <p style="margin:8px 0 16px">INTEGRACIÓN MÉDICA RODMAR S.A DE C.V es responsable del tratamiento de sus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP). Contacto: <strong>pablorm@imrodmar.com</strong></p>
+
+      <strong style="color:var(--teal);font-size:12px;letter-spacing:.5px;text-transform:uppercase">II. Datos que se recaban</strong>
+      <p style="margin:8px 0 16px">Únicamente se recaban datos de personal interno autorizado: correo electrónico corporativo y contraseña cifrada (nunca en texto plano). No se recaban datos sensibles, financieros ni de salud.</p>
+
+      <strong style="color:var(--teal);font-size:12px;letter-spacing:.5px;text-transform:uppercase">III. Finalidades</strong>
+      <p style="margin:8px 0 16px">Sus datos se usan exclusivamente para: autenticar el acceso al sistema de inventario, registrar operaciones para trazabilidad interna, y gestionar el ciclo de vida de las cuentas. No se usan para mercadotecnia ni se ceden a terceros con fines comerciales.</p>
+
+      <strong style="color:var(--teal);font-size:12px;letter-spacing:.5px;text-transform:uppercase">IV. Almacenamiento</strong>
+      <p style="margin:8px 0 16px">Los datos se almacenan en los servidores de Supabase Inc. (proveedor cloud bajo acuerdo de confidencialidad), con cifrado TLS en tránsito y hashing bcrypt en reposo. El acceso está restringido mediante Row Level Security.</p>
+
+      <strong style="color:var(--teal);font-size:12px;letter-spacing:.5px;text-transform:uppercase">V. Derechos ARCO</strong>
+      <p style="margin:8px 0 16px">Tiene derecho a Acceder, Rectificar, Cancelar u Oponerse al tratamiento de sus datos enviando una solicitud a <strong>pablorm@imrodmar.com</strong>. Será atendido en un máximo de 20 días hábiles.</p>
+
+      <strong style="color:var(--teal);font-size:12px;letter-spacing:.5px;text-transform:uppercase">VI. Cambios al aviso</strong>
+      <p style="margin:8px 0 0">Cualquier modificación será notificada al personal con al menos 5 días hábiles de anticipación por correo corporativo.</p>
+    </div>
+    <div style="padding:14px 26px;border-top:1px solid var(--pale);background:var(--paper);flex-shrink:0">
+      <button onclick="closePrivacidad()" style="width:100%;padding:10px;background:var(--ink);color:#fff;border:none;border-radius:var(--r-lg);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER MODO VISITANTE -->
+<div class="guest-banner">
+  👁 Estás en modo <strong>solo lectura</strong>. Para hacer cambios, <a href="#" onclick="showLoginScreen();return false;" style="color:var(--amber);font-weight:600;text-decoration:underline">inicia sesión</a>.
+</div>
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -674,6 +864,11 @@ body::before{
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </button>
+    <div id="user-pill" onclick="doLogout()" title="Cerrar sesión">
+      <div class="u-dot" id="u-initial">?</div>
+      <span id="u-email-lbl">—</span>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-left:2px;opacity:.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
     <button class="add-btn" onclick="openModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
       <span class="lbl">Nuevo producto</span>
@@ -1268,7 +1463,92 @@ async function runImport(){
   loadSilent();
   setTimeout(closeImport,2200);
 }
-load();
+function openPrivacidad(){document.getElementById('privacidad-modal').style.display='flex';}
+function closePrivacidad(){document.getElementById('privacidad-modal').style.display='none';}
+
+/* ══════════════════════════════════════════
+   AUTH — Login / Logout / Guest
+══════════════════════════════════════════ */
+function showLoginScreen(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-email').value='';
+  document.getElementById('l-pass').value='';
+  document.getElementById('login-err').style.display='none';
+  setTimeout(()=>document.getElementById('l-email').focus(),80);
+}
+function hideLoginScreen(){
+  document.getElementById('login-screen').style.display='none';
+}
+function enterAsGuest(){
+  hideLoginScreen();
+  document.body.classList.add('guest');
+  load();
+}
+function setUserUI(email){
+  const pill=document.getElementById('user-pill');
+  pill.style.display='flex';
+  document.getElementById('u-email-lbl').textContent=email.split('@')[0];
+  document.getElementById('u-initial').textContent=email[0].toUpperCase();
+  document.body.classList.remove('guest');
+}
+function clearUserUI(){
+  document.getElementById('user-pill').style.display='none';
+  document.body.classList.remove('guest');
+}
+
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const errEl=document.getElementById('login-err');
+  const btn=document.getElementById('login-btn');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Completa correo y contraseña.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Verificando...';
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  btn.disabled=false;
+  btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Iniciar sesión`;
+  if(error){
+    const msg=error.message.includes('Invalid login')||error.message.includes('invalid_credentials')
+      ?'Correo o contraseña incorrectos.'
+      :error.message.includes('Email not confirmed')
+      ?'Confirma tu correo antes de iniciar sesión.'
+      :'Error: '+error.message;
+    errEl.textContent=msg;errEl.style.display='block';
+    return;
+  }
+  hideLoginScreen();
+  setUserUI(data.user.email);
+  load();
+}
+
+async function doLogout(){
+  if(!confirm('¿Cerrar sesión?'))return;
+  await sb.auth.signOut();
+  clearUserUI();
+  items=[];render();
+  showLoginScreen();
+}
+
+/* Enter con tecla en login */
+['l-email','l-pass'].forEach(id=>{
+  document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
+
+/* ── Arranque: detectar sesión activa ── */
+(async function initAuth(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    hideLoginScreen();
+    setUserUI(session.user.email);
+    load();
+  }
+  // Escuchar cambios de sesión (expiración, etc.)
+  sb.auth.onAuthStateChange((event,session)=>{
+    if(event==='SIGNED_OUT'){clearUserUI();items=[];showLoginScreen();}
+    if(event==='TOKEN_REFRESHED'&&session) setUserUI(session.user.email);
+  });
+})();
+
 </script>
 </body>
 </html>
