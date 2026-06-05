@@ -298,10 +298,16 @@ body::before{
   border-radius:var(--r-xl);
   overflow:hidden;
   transition:box-shadow .22s,transform .16s;
-  animation:card-in .25s cubic-bezier(.22,1,.36,1) both;
 }
+.card.card-new{animation:card-in .25s cubic-bezier(.22,1,.36,1) both}
 .card:hover{box-shadow:0 12px 40px rgba(12,15,20,.1);transform:translateY(-2px)}
 @keyframes card-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#load-sentinel{grid-column:1/-1;height:40px;display:flex;align-items:center;justify-content:center}
+#load-sentinel .sentinel-spin{
+  width:22px;height:22px;border:2px solid var(--ghost);border-top-color:var(--ink);
+  border-radius:50%;animation:spin .7s linear infinite;display:none;
+}
+#load-sentinel.loading .sentinel-spin{display:block}
 
 /* status accent — left strip */
 .card-strip{width:4px;flex-shrink:0}
@@ -891,6 +897,8 @@ try{
 }catch(e){showErr('No se pudo inicializar Supabase.',e.message);}
 
 let items=[],fil='all',qry='',catFil='all';
+let _visCache=[],_pageSize=50,_rendered=0,_renderPending=false;
+let _observer=null;
 
 function setErr(msg){
   document.getElementById('sync-lbl').textContent=msg;
@@ -950,10 +958,14 @@ async function loadSilent(){
   }catch(e){console.warn(e);}
 }
 
+const _statusCache=new Map();
 function status(p){
-  if(p.cantidad<=p.minimo)return'sc';
-  if(p.cantidad<=p.minimo*1.6)return'sl';
-  return'so';
+  const cached=_statusCache.get(p.id);
+  // invalidate if cantidad changed
+  if(cached&&cached.qty===p.cantidad)return cached.s;
+  const s=p.cantidad<=p.minimo?'sc':p.cantidad<=p.minimo*1.6?'sl':'so';
+  _statusCache.set(p.id,{s,qty:p.cantidad});
+  return s;
 }
 function barCol(s){return s==='sc'?'#e53535':s==='sl'?'#d97706':'#14b8a6';}
 function badgeHtml(s){
@@ -971,8 +983,13 @@ function updateKpis(){
   document.getElementById('k-ok').textContent=so;
 }
 function render(){
+  if(_renderPending)return;
+  _renderPending=true;
+  requestAnimationFrame(()=>{_renderPending=false;_doRender();});
+}
+function _doRender(){
   updateKpis();
-  const vis=items.filter(p=>{
+  _visCache=items.filter(p=>{
     const s=status(p);
     return(fil==='all'||s===fil)&&
       (catFil==='all'||(p.categoria||'')===(catFil))&&
@@ -980,64 +997,101 @@ function render(){
       (p.codigo&&p.codigo.toLowerCase().includes(qry.toLowerCase())));
   });
   const titles={all:'Todos los productos',sc:'Críticos — pedir urgente',sl:'Stock bajo',so:'En nivel normal'};
-  document.getElementById('section-title').textContent=titles[fil]+' ('+vis.length+')';
+  document.getElementById('section-title').textContent=titles[fil]+' ('+_visCache.length+')';
   const g=document.getElementById('grid');
-  if(!vis.length){
+  // Disconnect old observer
+  if(_observer){_observer.disconnect();_observer=null;}
+  if(!_visCache.length){
     g.innerHTML='<div class="empty"><div class="empty-glyph">∅</div><p>No se encontraron productos'+(qry?' con ese criterio':'')+'</p></div>';
     return;
   }
-  g.innerHTML=vis.map(p=>{
-    const s=status(p);
-    const pct=Math.min(100,Math.round(p.cantidad/Math.max(p.maximo,1)*100));
-    const fecha=new Date(p.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
-    return`<div class="card">
-      <div class="card-inner-row">
-        <div class="card-strip ${s}"></div>
-        <div class="card-body">
-          <div class="card-top">
-            <div>
-              <div class="card-code">${p.codigo||'SIN CÓDIGO'}${p.categoria?` <span style="font-size:10px;font-weight:600;background:var(--pale);color:var(--mid);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${p.categoria}</span>`:''}</div>
-              <div class="card-name">${p.nombre}</div>
-              <div class="card-range">Mín ${p.minimo} · Máx ${p.maximo} uds.</div>
-            </div>
-            ${badgeHtml(s)}
+  _rendered=0;
+  g.innerHTML='<div id="load-sentinel"><div class="sentinel-spin"></div></div>';
+  _appendCards(g, Math.min(_pageSize, _visCache.length));
+  _setupObserver(g);
+}
+function _cardHtml(p,animate){
+  const s=status(p);
+  const pct=Math.min(100,Math.round(p.cantidad/Math.max(p.maximo,1)*100));
+  const fecha=new Date(p.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+  return`<div class="card${animate?' card-new':''}">
+    <div class="card-inner-row">
+      <div class="card-strip ${s}"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-code">${p.codigo||'SIN CÓDIGO'}${p.categoria?` <span style="font-size:10px;font-weight:600;background:var(--pale);color:var(--mid);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${p.categoria}</span>`:''}</div>
+            <div class="card-name">${p.nombre}</div>
+            <div class="card-range">Mín ${p.minimo} · Máx ${p.maximo} uds.</div>
           </div>
-          <div class="card-mid">
-            <div class="qty-ctrl">
-              <button class="qbtn" onclick="chg('${p.id}',-1)">−</button>
-              <div class="qnum">${p.cantidad}</div>
-              <button class="qbtn" onclick="chg('${p.id}',1)">+</button>
+          ${badgeHtml(s)}
+        </div>
+        <div class="card-mid">
+          <div class="qty-ctrl">
+            <button class="qbtn" onclick="chg('${p.id}',-1)">−</button>
+            <div class="qnum">${p.cantidad}</div>
+            <button class="qbtn" onclick="chg('${p.id}',1)">+</button>
+          </div>
+          <div class="bar-col">
+            <div class="bar-top">
+              <span class="bar-lbl">Nivel de stock</span>
+              <span class="bar-pct">${pct}%</span>
             </div>
-            <div class="bar-col">
-              <div class="bar-top">
-                <span class="bar-lbl">Nivel de stock</span>
-                <span class="bar-pct">${pct}%</span>
-              </div>
-              <div class="bar-track">
-                <div class="bar-fill" style="width:${pct}%;background:${barCol(s)}"></div>
-              </div>
-              <div class="bar-limits">
-                <span>0</span>
-                <span class="warn">mín ${p.minimo}</span>
-                <span>${p.maximo}</span>
-              </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%;background:${barCol(s)}"></div>
+            </div>
+            <div class="bar-limits">
+              <span>0</span>
+              <span class="warn">mín ${p.minimo}</span>
+              <span>${p.maximo}</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="card-foot">
-        <span class="card-date">Alta ${fecha}</span>
-        <button class="del-btn" onclick="del('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6M14 11v6"/>
-            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-          </svg>
-        </button>
-      </div>
-    </div>`;
-  }).join('');
+    </div>
+    <div class="card-foot">
+      <span class="card-date">Alta ${fecha}</span>
+      <button class="del-btn" onclick="del('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+      </button>
+    </div>
+  </div>`;
+}
+function _appendCards(g, count){
+  const sentinel=document.getElementById('load-sentinel');
+  const frag=document.createDocumentFragment();
+  const end=Math.min(_rendered+count,_visCache.length);
+  // Build HTML string for batch, then parse once
+  let html='';
+  for(let i=_rendered;i<end;i++) html+=_cardHtml(_visCache[i],false);
+  const tmp=document.createElement('div');
+  tmp.innerHTML=html;
+  while(tmp.firstChild) frag.appendChild(tmp.firstChild);
+  g.insertBefore(frag,sentinel);
+  _rendered=end;
+  if(_rendered>=_visCache.length){
+    sentinel.innerHTML='';
+    sentinel.classList.remove('loading');
+  }
+}
+function _setupObserver(g){
+  const sentinel=document.getElementById('load-sentinel');
+  if(!sentinel||_rendered>=_visCache.length)return;
+  _observer=new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting&&_rendered<_visCache.length){
+      sentinel.classList.add('loading');
+      setTimeout(()=>{
+        _appendCards(g,_pageSize);
+        if(_rendered>=_visCache.length)sentinel.classList.remove('loading');
+      },0);
+    }
+  },{rootMargin:'200px'});
+  _observer.observe(sentinel);
 }
 
 async function chg(id,d){
@@ -1045,13 +1099,17 @@ async function chg(id,d){
   const nq=Math.max(0,p.cantidad+d);
   const{error}=await sb.from('productos').update({cantidad:nq}).eq('id',id);
   if(error){showToast('Error: '+error.message);return;}
-  p.cantidad=nq;render();
+  p.cantidad=nq;
+  _statusCache.delete(id);
+  render();
 }
 async function del(id,nombre){
   if(!confirm('¿Eliminar "'+nombre+'"?\nEsta acción no se puede deshacer.'))return;
   const{error}=await sb.from('productos').delete().eq('id',id);
   if(error){showToast('Error: '+error.message);return;}
-  items=items.filter(x=>x.id!==id);render();
+  items=items.filter(x=>x.id!==id);
+  _statusCache.delete(id);
+  render();
   showToast('Producto eliminado');
 }
 
@@ -1094,7 +1152,12 @@ function toggleTheme(){
   localStorage.setItem('rodmar-theme',dark?'dark':'light');
 }
 
-document.getElementById('q').addEventListener('input',e=>{qry=e.target.value;render();});
+let _debounceTimer=null;
+document.getElementById('q').addEventListener('input',e=>{
+  qry=e.target.value;
+  clearTimeout(_debounceTimer);
+  _debounceTimer=setTimeout(render,180);
+});
 document.querySelectorAll('.chip:not(.chip-cat)').forEach(c=>{
   c.addEventListener('click',()=>{
     fil=c.dataset.f;
