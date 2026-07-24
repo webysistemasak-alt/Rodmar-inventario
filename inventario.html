@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://mdikqwgqhtiefhmiootr.supabase.co wss://mdikqwgqhtiefhmiootr.supabase.co https://raw.githubusercontent.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://raw.githubusercontent.com data:;">
 <title>RODMAR — Inventario</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Thasadith:ital,wght@0,400;0,700;1,400;1,700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Thasadith:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -193,9 +193,9 @@ body.dark .brand-mark img{filter:brightness(1.05)}
 .brand-mark-fb{
   height:34px;
   display:flex;align-items:center;
-  font-family:'DM Serif Display',serif;
-  font-size:26px;color:var(--ink);letter-spacing:-1px;flex-shrink:0;
-  font-style:italic;
+  font-family:'Thasadith',serif;
+  font-size:24px;color:var(--ink);letter-spacing:.3px;flex-shrink:0;
+  font-style:italic;font-weight:700;
 }
 .brand-text{}
 .brand-name{
@@ -298,10 +298,11 @@ body.dark .add-btn:hover{background:var(--gold-2);box-shadow:0 0 22px var(--gold
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .kpi-val{
-  font-family:'DM Serif Display',serif;
-  font-size:68px;line-height:1;
-  color:var(--ink);letter-spacing:-3px;
-  margin-bottom:10px;font-weight:400;
+  font-family:'Thasadith',serif;
+  font-size:62px;line-height:1;
+  color:var(--ink);letter-spacing:-1.5px;
+  margin-bottom:10px;font-weight:700;
+  font-variant-numeric:tabular-nums;
 }
 .kpi-val.kr{color:var(--red-2)}
 .kpi-val.ka{color:var(--amb-2)}
@@ -399,9 +400,9 @@ body.dark .chip.on-g{box-shadow:0 0 10px var(--tea-glow)}
   position:relative;z-index:1;
 }
 .section-title{
-  font-family:'DM Serif Display',serif;
+  font-family:'Thasadith',serif;
   font-style:italic;
-  font-size:21px;color:var(--ink);letter-spacing:-.3px;font-weight:400;
+  font-size:22px;color:var(--ink);letter-spacing:0;font-weight:700;
 }
 .section-meta{font-size:12px;color:var(--mid);font-weight:500}
 .sync-inline{
@@ -445,21 +446,21 @@ body.dark .card:hover{box-shadow:0 16px 46px rgba(0,0,0,.55),0 0 0 1px var(--gol
 /* status accent — left strip */
 .card-strip{width:5px;flex-shrink:0}
 .card-inner-row{display:flex}
-.card-strip.sc{background:linear-gradient(180deg,#ff6b6b,#dc2626)}
-.card-strip.sl{background:linear-gradient(180deg,#ffd166,#d97706)}
-.card-strip.so{background:linear-gradient(180deg,#4ade80,#059669)}
+.card-strip.sc{background:linear-gradient(180deg,var(--red-2),var(--red))}
+.card-strip.sl{background:linear-gradient(180deg,var(--amb-2),var(--amber))}
+.card-strip.so{background:linear-gradient(180deg,var(--teal-2),var(--teal))}
 .card-body{flex:1;padding:18px 18px 0;min-width:0}
 
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
 .card-meta-row{display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap}
 .card-code{
   display:inline-flex;align-items:center;gap:4px;
-  font-family:'DM Mono',monospace;
-  font-size:11px;font-weight:500;
+  font-family:'Thasadith',sans-serif;
+  font-size:11.5px;font-weight:700;
   color:var(--code-text);
   background:var(--code-bg);
   border:1.5px solid var(--code-br);
-  letter-spacing:.7px;
+  letter-spacing:.6px;
   text-transform:uppercase;
   padding:3px 9px;
   border-radius:6px;
@@ -472,7 +473,7 @@ body.dark .card:hover{box-shadow:0 16px 46px rgba(0,0,0,.55),0 0 0 1px var(--gol
   font-weight:700;
 }
 body.dark .card-code{
-  box-shadow:0 0 10px rgba(167,139,250,.18);
+  box-shadow:0 0 10px var(--gold-glow);
 }
 .cat-chip{
   display:inline-flex;align-items:center;
@@ -485,15 +486,18 @@ body.dark .card-code{
   text-transform:uppercase;
 }
 body.dark .cat-chip{
-  background:#1e3a5f;
-  color:#93c5fd;
-  box-shadow:0 0 8px rgba(147,197,253,.12);
+  box-shadow:0 0 8px var(--gold-glow);
 }
-.card-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.35;max-width:200px;letter-spacing:-.1px}
-.card-range{font-size:10.5px;color:var(--mid);margin-top:3px;font-weight:500}
+.card-name{
+  font-size:15px;font-weight:700;color:var(--ink);
+  line-height:1.35;letter-spacing:-.1px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;min-height:calc(15px*1.35*2);
+}
+.card-range{font-size:11px;color:var(--mid);margin-top:5px;font-weight:500}
 
 .badge{
-  font-size:10px;font-weight:700;
+  font-size:10.5px;font-weight:700;
   padding:4px 10px;border-radius:var(--r-pill);
   white-space:nowrap;flex-shrink:0;letter-spacing:.4px;
   text-transform:uppercase;
@@ -528,26 +532,22 @@ body.dark .bo{box-shadow:0 0 12px var(--tea-glow),inset 0 1px 0 rgba(74,222,128,
 }
 .qbtn{
   width:36px;height:52px;border:none;background:var(--pale);
-  color:var(--ink);font-size:20px;cursor:pointer;
+  color:var(--ink);font-size:19px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:background .12s,color .12s;
-  font-weight:300;line-height:1;
+  font-weight:700;line-height:1;font-family:'Thasadith',sans-serif;
 }
 .qbtn:hover{background:var(--ink);color:#ffffff}
 body.dark .qbtn:hover{color:#080e1c}
 .qbtn:active{opacity:.8}
 .qnum{
   width:64px;height:52px;display:flex;align-items:center;justify-content:center;
-  font-family:'DM Serif Display',serif;
-  font-size:32px;color:var(--ink);
+  font-family:'Thasadith',serif;
+  font-size:28px;color:var(--ink);
   border-left:1.5px solid var(--ghost);
   border-right:1.5px solid var(--ghost);
-  letter-spacing:-1.5px;background:var(--card);
-  font-weight:400;
-}
-  border-right:1.5px solid var(--ghost);
-  letter-spacing:-1px;background:var(--card);
-  font-weight:400;
+  letter-spacing:-.5px;background:var(--card);
+  font-weight:700;font-variant-numeric:tabular-nums;
 }
 /* ─── IMPORT PARAMS GRID ─── */
 .import-params-grid{
@@ -579,10 +579,10 @@ body.dark .qbtn:hover{color:#080e1c}
 /* ─── STOCK BAR — diseño mejorado con badge de porcentaje ─── */
 .bar-col{flex:1;min-width:0}
 .bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.bar-lbl{font-size:9.5px;color:var(--mid);font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+.bar-lbl{font-size:10.5px;color:var(--mid);font-weight:600;letter-spacing:.4px;text-transform:uppercase}
 .bar-pct-badge{
   font-size:11px;font-weight:700;
-  font-family:'DM Mono',monospace;
+  font-family:'Thasadith',sans-serif;
   padding:2px 7px;border-radius:var(--r-pill);
   font-variant-numeric:tabular-nums;
 }
@@ -609,7 +609,7 @@ body.dark .bar-pct-badge.bp-g{box-shadow:0 0 8px var(--tea-glow)}
 }
 .bar-limits{
   display:flex;justify-content:space-between;
-  margin-top:5px;font-size:9.5px;color:var(--muted);font-weight:500;
+  margin-top:5px;font-size:10px;color:var(--muted);font-weight:600;
 }
 .bar-limits .warn{color:var(--red-2);font-weight:700}
 
@@ -651,8 +651,8 @@ body.guest .edit-btn{display:none!important}
   padding:6rem 2rem;gap:14px;text-align:center;
 }
 .empty-glyph{
-  font-family:'DM Serif Display',serif;font-style:italic;
-  font-size:64px;color:var(--ghost);line-height:1;margin-bottom:4px;
+  font-family:'Thasadith',serif;font-style:italic;font-weight:700;
+  font-size:60px;color:var(--ghost);line-height:1;margin-bottom:4px;
 }
 .empty p{font-size:14px;color:var(--soft)}
 .spinner{
@@ -670,10 +670,10 @@ body.guest .edit-btn{display:none!important}
   border-radius:var(--r-xl);padding:36px;grid-column:1/-1;
 }
 .err-icon{font-size:40px;margin-bottom:6px}
-.err-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--red)}
+.err-title{font-family:'Thasadith',serif;font-style:italic;font-weight:700;font-size:20px;color:var(--red)}
 .err-msg{font-size:13px;color:var(--mid);line-height:1.65;max-width:480px}
 .err-code{
-  font-family:'DM Mono',monospace;font-size:11px;
+  font-family:'Thasadith',sans-serif;font-size:11px;
   background:var(--white);border:1px solid var(--red-br);
   border-radius:var(--r);padding:10px 14px;
   color:var(--mid);word-break:break-all;max-width:540px;text-align:left;
@@ -694,10 +694,10 @@ body.guest .edit-btn{display:none!important}
   border-radius:var(--r-xl);padding:40px;
   display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
 }
-.file-warn-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--amber)}
+.file-warn-title{font-family:'Thasadith',serif;font-style:italic;font-weight:700;font-size:22px;color:var(--amber)}
 .file-warn-msg{font-size:13px;color:var(--mid);line-height:1.7;max-width:500px}
 .file-warn-code{
-  font-family:'DM Mono',monospace;font-size:11px;
+  font-family:'Thasadith',sans-serif;font-size:11px;
   background:var(--white);border:1px solid var(--amb-br);border-radius:var(--r);
   padding:10px 16px;color:var(--ink-3);word-break:break-all;max-width:480px;
 }
@@ -724,8 +724,9 @@ body.guest .edit-btn{display:none!important}
   display:flex;align-items:flex-start;justify-content:space-between;
 }
 .modal-title{
-  font-family:'DM Serif Display',serif;
-  font-size:20px;color:var(--ink);letter-spacing:-.3px;line-height:1.2;
+  font-family:'Thasadith',serif;
+  font-style:italic;font-weight:700;
+  font-size:20px;color:var(--ink);letter-spacing:0;line-height:1.2;
 }
 .modal-sub{font-size:11.5px;color:var(--soft);margin-top:3px}
 .x-btn{
@@ -889,11 +890,11 @@ body.dark .btn-primary{color:#080e1c}
 
   /* Cards */
   .card-body{padding:16px 16px 0}
-  .card-name{font-size:14px;max-width:none}
+  .card-name{font-size:15px}
   .card-range{font-size:10.5px}
   .card-mid{gap:10px;margin-bottom:14px}
   .qbtn{width:38px;height:52px;font-size:22px}
-  .qnum{width:60px;height:52px;font-size:30px}
+  .qnum{width:58px;height:52px;font-size:25px}
   .bar-lbl{font-size:10px}
   .card-foot{padding:9px 16px}
 
@@ -948,8 +949,8 @@ body.dark .btn-primary{color:#080e1c}
   content:'';
   position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 700px 500px at 10% 10%, rgba(14,122,108,.05) 0%, transparent 65%),
-    radial-gradient(ellipse 600px 400px at 90% 90%, rgba(197,26,26,.04) 0%, transparent 65%);
+    radial-gradient(ellipse 700px 500px at 10% 10%, var(--gold-glow) 0%, transparent 65%),
+    radial-gradient(ellipse 600px 400px at 90% 90%, var(--red-glow) 0%, transparent 65%);
   pointer-events:none;
 }
 .login-card{
@@ -975,13 +976,14 @@ body.dark .login-logo-wrap img{
 }
 /* Fallback texto si no carga imagen */
 .login-logo-fb{
-  font-family:'DM Serif Display',serif;
-  font-size:34px;color:var(--ink);letter-spacing:-1.5px;
-  font-style:italic;line-height:1;
+  font-family:'Thasadith',serif;
+  font-size:32px;color:var(--ink);letter-spacing:.2px;
+  font-style:italic;font-weight:700;line-height:1;
 }
 .login-title{
-  font-family:'DM Serif Display',serif;
-  font-size:20px;color:var(--ink);letter-spacing:-.3px;
+  font-family:'Thasadith',serif;
+  font-style:italic;font-weight:700;
+  font-size:21px;color:var(--ink);letter-spacing:0;
   margin-bottom:4px;line-height:1.2;
 }
 .login-sub{font-size:12px;color:var(--soft);line-height:1.5}
@@ -1071,8 +1073,8 @@ body.guest .qty-ctrl{pointer-events:none;opacity:.5}
   text-align:center;position:relative;z-index:2;
 }
 body.guest .guest-banner{display:block}
-@media(max-width:600px){.guest-banner{padding:9px 14px}}
-
+@media(max-width:600px){
+  .guest-banner{padding:9px 14px}
   .kpi-tile{flex:1 1 calc(50% - 4px)}
   .filter-group{grid-template-columns:repeat(2,1fr)}
   .chip{padding:7px 6px}
@@ -1125,7 +1127,7 @@ body.guest .guest-banner{display:block}
   <div style="background:var(--white);border-radius:var(--r-xl);border:1px solid var(--ghost);width:540px;max-width:100%;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(12,15,20,.22)">
     <div style="padding:22px 26px 18px;border-bottom:1px solid var(--pale);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0">
       <div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)">Aviso de Privacidad</div>
+        <div style="font-family:'Thasadith',serif;font-style:italic;font-weight:700;font-size:20px;color:var(--ink)">Aviso de Privacidad</div>
         <div style="font-size:11.5px;color:var(--soft);margin-top:3px">INTEGRACIÓN MÉDICA RODMAR S.A DE C.V — Sistema de Inventario</div>
       </div>
       <button onclick="closePrivacidad()" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--ghost);background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
@@ -1383,8 +1385,8 @@ body.guest .guest-banner{display:block}
     </div>
     <div class="modal-body" style="box-sizing:border-box;overflow:hidden">
       <div class="field">
-        <label>Formato por línea: <code style="font-family:monospace;font-size:11px;background:var(--pale);padding:2px 6px;border-radius:4px">CATEGORIA,CODIGO,NOMBRE</code></label>
-        <textarea id="import-txt" rows="6" placeholder="CARDIO,007042,GUIA TEFLONADA J .035 X 145&#10;PERI,ABC-001,CATETER 5FR&#10;..." style="width:100%;padding:10px 12px;border:1px solid var(--ghost);border-radius:var(--r-lg);font-size:12px;font-family:'DM Mono',monospace;color:var(--ink);background:var(--white);outline:none;resize:none;margin-top:6px;box-sizing:border-box;display:block"></textarea>
+        <label>Formato por línea: <code style="font-family:'Thasadith',sans-serif;font-weight:700;font-size:11px;background:var(--pale);padding:2px 6px;border-radius:4px;letter-spacing:.3px">CATEGORIA,CODIGO,NOMBRE</code></label>
+        <textarea id="import-txt" rows="6" placeholder="CARDIO,007042,GUIA TEFLONADA J .035 X 145&#10;PERI,ABC-001,CATETER 5FR&#10;..." style="width:100%;padding:10px 12px;border:1px solid var(--ghost);border-radius:var(--r-lg);font-size:12px;font-family:'Thasadith',sans-serif;color:var(--ink);background:var(--white);outline:none;resize:none;margin-top:6px;box-sizing:border-box;display:block"></textarea>
       </div>
       <div class="import-params-grid">
         <div class="import-param">
@@ -1553,7 +1555,7 @@ function status(p){
   _statusCache.set(p.id,{s,qty:p.cantidad});
   return s;
 }
-function barCol(s){return s==='sc'?'#e53535':s==='sl'?'#d97706':'#14b8a6';}
+function barCol(s){return s==='sc'?'linear-gradient(90deg,var(--red-2),var(--red))':s==='sl'?'linear-gradient(90deg,var(--amb-2),var(--amber))':'linear-gradient(90deg,var(--teal-2),var(--teal))';}
 function badgeHtml(s){
   if(s==='sc')return'<span class="badge bc">Pedir urgente</span>';
   if(s==='sl')return'<span class="badge bl">Stock bajo</span>';
