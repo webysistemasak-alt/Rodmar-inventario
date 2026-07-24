@@ -23,6 +23,7 @@
   --white:  #fdfbf6;        /* marfil cálido — no blanco puro */
   --card:   #ffffff;
   --shadow: rgba(26,22,19,.10);
+  --ink-bg: #eae5d9;        /* fondo neutro para el KPI "Total" — no compite con ámbar/dorado */
 
   /* ACENTO PREMIUM — bronce/oro envejecido */
   --gold:     #9c7327;
@@ -38,11 +39,11 @@
   --red-br: #d9a9a2;
   --red-glow: rgba(168,42,42,.15);
 
-  --amber:  #6b4a17;
-  --amb-2:  #a1721e;
-  --amb-bg: #faf1de;
-  --amb-br: #d9bd82;
-  --amb-glow: rgba(161,114,30,.15);
+  --amber:  #a35a12;
+  --amb-2:  #d1821f;
+  --amb-bg: #fcefdb;
+  --amb-br: #e0a855;
+  --amb-glow: rgba(209,130,31,.20);
 
   --teal:   #0f4a3c;
   --teal-2: #1c7a5e;
@@ -76,6 +77,7 @@ body.dark{
   --white:  #15110b;
   --card:   #1b160f;        /* cards espresso oscuro — no negro puro */
   --shadow: rgba(0,0,0,.6);
+  --ink-bg: #2c2619;        /* fondo neutro para el KPI "Total" — no compite con ámbar/dorado */
 
   /* ACENTO PREMIUM — dorado brillante en oscuro */
   --gold:     #e0b968;
@@ -91,12 +93,12 @@ body.dark{
   --red-br: #5c2a26;
   --red-glow: rgba(217,107,107,.18);
 
-  /* BAJO — bronce luminoso */
-  --amber:  #e0bd7a;
-  --amb-2:  #d1a256;
-  --amb-bg: #241a0a;
-  --amb-br: #5c4419;
-  --amb-glow: rgba(209,162,86,.18);
+  /* BAJO — naranja ámbar vívido, claramente distinto del dorado */
+  --amber:  #f0a04a;
+  --amb-2:  #ffb768;
+  --amb-bg: #2c1c0a;
+  --amb-br: #7a5324;
+  --amb-glow: rgba(240,160,74,.22);
 
   /* NORMAL — verde bosque luminoso */
   --teal:   #7fc9ab;
@@ -123,7 +125,7 @@ body.dark::before{
 }
 
 body.dark .topbar{background:rgba(14,11,7,.93);border-bottom-color:var(--ghost);box-shadow:0 1px 0 var(--ghost),0 4px 24px rgba(0,0,0,.4)}
-body.dark .kpi-tile:nth-child(1) .kpi-icon{background:var(--gold-bg)!important}
+body.dark .kpi-tile:nth-child(1) .kpi-icon{box-shadow:0 3px 14px rgba(0,0,0,.5)}
 body.dark .search-box input:focus{box-shadow:0 0 0 3px rgba(224,185,104,.14)}
 
 /* Dark mode toggle button */
@@ -280,10 +282,10 @@ body.dark .add-btn:hover{background:var(--gold-2);box-shadow:0 0 22px var(--gold
 .kpi-tile:hover{box-shadow:0 4px 8px rgba(26,22,19,.06),0 16px 40px rgba(26,22,19,.10);transform:translateY(-3px);border-color:var(--soft)}
 .kpi-tile::after{
   content:'';
-  position:absolute;bottom:0;left:0;right:0;height:3px;
+  position:absolute;bottom:0;left:0;right:0;height:4px;
   border-radius:0 0 var(--r-xl) var(--r-xl);
 }
-.kpi-tile:nth-child(1)::after{background:linear-gradient(90deg,var(--gold),var(--gold-2))}
+.kpi-tile:nth-child(1)::after{background:linear-gradient(90deg,var(--soft),var(--ink))}
 .kpi-tile:nth-child(2)::after{background:linear-gradient(90deg,var(--red),var(--red-2))}
 .kpi-tile:nth-child(3)::after{background:linear-gradient(90deg,var(--amber),var(--amb-2))}
 .kpi-tile:nth-child(4)::after{background:linear-gradient(90deg,var(--teal),var(--teal-2))}
@@ -291,12 +293,18 @@ body.dark .add-btn:hover{background:var(--gold-2);box-shadow:0 0 22px var(--gold
   font-size:10.5px;font-weight:700;color:var(--mid);
   letter-spacing:1.4px;text-transform:uppercase;
   margin-bottom:16px;
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:9px;
 }
 .kpi-icon{
-  width:24px;height:24px;border-radius:7px;
+  width:32px;height:32px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
+.kpi-icon.ic-n{background:linear-gradient(145deg,var(--ink-2),var(--ink));box-shadow:0 3px 10px rgba(26,22,19,.28)}
+.kpi-icon.ic-r{background:linear-gradient(145deg,var(--red-2),var(--red));box-shadow:0 3px 10px var(--red-glow)}
+.kpi-icon.ic-a{background:linear-gradient(145deg,var(--amb-2),var(--amber));box-shadow:0 3px 10px var(--amb-glow)}
+.kpi-icon.ic-t{background:linear-gradient(145deg,var(--teal-2),var(--teal));box-shadow:0 3px 10px var(--tea-glow)}
+.kpi-icon svg{stroke:#fff!important}
+.kpi-icon.ic-n svg{stroke:var(--card)!important}
 .kpi-val{
   font-family:'Thasadith',serif;
   font-size:62px;line-height:1;
@@ -444,7 +452,7 @@ body.dark .card:hover{box-shadow:0 16px 46px rgba(0,0,0,.55),0 0 0 1px var(--gol
 #load-sentinel.loading .sentinel-spin{display:block}
 
 /* status accent — left strip */
-.card-strip{width:5px;flex-shrink:0}
+.card-strip{width:6px;flex-shrink:0}
 .card-inner-row{display:flex}
 .card-strip.sc{background:linear-gradient(180deg,var(--red-2),var(--red))}
 .card-strip.sl{background:linear-gradient(180deg,var(--amb-2),var(--amber))}
@@ -504,23 +512,26 @@ body.dark .cat-chip{
   transition:box-shadow .15s;
 }
 .bc{
-  background:var(--red-bg);
-  color:var(--red);
-  border:1.5px solid var(--red-br);
+  background:linear-gradient(145deg,var(--red-2),var(--red));
+  color:#fff;
+  border:1.5px solid transparent;
 }
 .bl{
-  background:var(--amb-bg);
-  color:var(--amber);
-  border:1.5px solid var(--amb-br);
+  background:linear-gradient(145deg,var(--amb-2),var(--amber));
+  color:#fff;
+  border:1.5px solid transparent;
 }
 .bo{
-  background:var(--tea-bg);
-  color:var(--teal);
-  border:1.5px solid var(--tea-br);
+  background:linear-gradient(145deg,var(--teal-2),var(--teal));
+  color:#fff;
+  border:1.5px solid transparent;
 }
-body.dark .bc{box-shadow:0 0 12px var(--red-glow),inset 0 1px 0 rgba(255,107,107,.1)}
-body.dark .bl{box-shadow:0 0 12px var(--amb-glow),inset 0 1px 0 rgba(255,209,102,.1)}
-body.dark .bo{box-shadow:0 0 12px var(--tea-glow),inset 0 1px 0 rgba(74,222,128,.1)}
+.bc{box-shadow:0 2px 8px var(--red-glow)}
+.bl{box-shadow:0 2px 8px var(--amb-glow)}
+.bo{box-shadow:0 2px 8px var(--tea-glow)}
+body.dark .bc{box-shadow:0 0 14px var(--red-glow),inset 0 1px 0 rgba(255,255,255,.15)}
+body.dark .bl{box-shadow:0 0 14px var(--amb-glow),inset 0 1px 0 rgba(255,255,255,.15)}
+body.dark .bo{box-shadow:0 0 14px var(--tea-glow),inset 0 1px 0 rgba(255,255,255,.15)}
 
 /* QTY + BAR */
 .card-mid{display:flex;align-items:center;gap:14px;margin-bottom:16px}
@@ -870,7 +881,8 @@ body.dark .btn-primary{color:#080e1c}
   .hero{padding:14px 12px 0;gap:8px}
   .kpi-tile{flex:1 1 calc(50% - 4px);min-width:0;padding:16px 14px 18px}
   .kpi-eyebrow{font-size:9px;margin-bottom:10px;gap:5px}
-  .kpi-icon{width:16px;height:16px;border-radius:4px}
+  .kpi-icon{width:22px;height:22px;border-radius:6px}
+  .kpi-icon svg{width:12px;height:12px}
   .kpi-val{font-size:52px;letter-spacing:-3px;margin-bottom:6px}
   .kpi-desc{font-size:10.5px;line-height:1.3}
 
@@ -1197,8 +1209,8 @@ body.guest .guest-banner{display:block}
 <section class="hero">
   <div class="kpi-tile">
     <div class="kpi-eyebrow">
-      <div class="kpi-icon" style="background:var(--gold-bg)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <div class="kpi-icon ic-n">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
       </div>
       Total
     </div>
@@ -1207,8 +1219,8 @@ body.guest .guest-banner{display:block}
   </div>
   <div class="kpi-tile">
     <div class="kpi-eyebrow">
-      <div class="kpi-icon" style="background:var(--red-bg)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="kpi-icon ic-r">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
       Críticos
     </div>
@@ -1217,8 +1229,8 @@ body.guest .guest-banner{display:block}
   </div>
   <div class="kpi-tile">
     <div class="kpi-eyebrow">
-      <div class="kpi-icon" style="background:var(--amb-bg)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="m10.29 3.86-8.28 14.28A2 2 0 0 0 3.74 21h16.52a2 2 0 0 0 1.73-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="kpi-icon ic-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
       </div>
       Bajo
     </div>
@@ -1227,8 +1239,8 @@ body.guest .guest-banner{display:block}
   </div>
   <div class="kpi-tile">
     <div class="kpi-eyebrow">
-      <div class="kpi-icon" style="background:var(--tea-bg)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div class="kpi-icon ic-t">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
       Normal
     </div>
